@@ -1,18 +1,16 @@
-ZFS Tools
-====================
+# ZFS Tools
 
 Various scripts for administrating ZFS
 
-Scripts
----------------------
+## Scripts
 
 ### cleanup_snapshots.sh
 
 Cleans up zero-sized snapshots.
 
-### Usage
+#### Usage
 
-Add to crontab:
+#### Crontab
 
     */20 * * * * /usr/local/bin/zfs-tools/cleanup_snapshots.sh
 
@@ -20,9 +18,10 @@ Add to crontab:
 
 Snapshots a mysql server's databases.
 
-### Usage
+#### Usage
 
 Setup a `/root/.my.cnf` with the relevant informatnion on where to connect to, with the proper username/password that has access to `FLUSH LOGS` and `FLUSH TABLES WITH READ LOCK`.
-Add to crontab:
+
+#### Crontab
 
     */10 * * * * env - HOME=/root /usr/local/bin/zfs-tools/snapshot_mysql.sh
