@@ -8,6 +8,6 @@ for snapshot in $snapshots; do
   size=$(zfs get -Hp -o value used $snapshot)
   if [ $size -eq 0 ]; then
     echo "Destroying size:$size snapshot: $snapshot"
-    zfs destroy $snapshot
+    zfs destroy -d $snapshot
   fi
 done
