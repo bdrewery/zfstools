@@ -142,7 +142,7 @@ interval=ARGV[0]
 keep=ARGV[1].to_i
 
 # Generate new snapshots
-do_new_snapshots(interval)
+do_new_snapshots(interval) if keep > 0
 
 def find_matching_snapshots(interval)
   dataset_snapshots = {}
