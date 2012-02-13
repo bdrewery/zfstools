@@ -12,7 +12,7 @@ Cleans up zero-sized snapshots.
 
 #### Crontab
 
-    */20 * * * * /usr/local/bin/zfs-tools/cleanup_snapshots.sh
+    */20 * * * * /usr/local/sbin/zfstools/cleanup_snapshots.sh
 
 ### snapshot_mysql.sh
 
@@ -24,4 +24,4 @@ Setup a `/root/.my.cnf` with the relevant informatnion on where to connect to, w
 
 #### Crontab
 
-    */10 * * * * env - HOME=/root /usr/local/bin/zfs-tools/snapshot_mysql.sh
+    */10 * * * * env - HOME=/root /usr/local/sbin/zfstools/snapshot_mysql.sh
