@@ -16,10 +16,13 @@ end
 
 
 def usage
-  puts "Usage: $0 <INTERVAL> <KEEP>"
-  puts "\t-u: Use UTC for snapshots."
-  puts "\tINTERVAL: The interval to snapshot."
-  puts "\tKEEP: How many snapshots to keep."
+  puts <<-EOF
+Usage: $0 [-u] <INTERVAL> <KEEP>
+  EOF
+  format = "    %-15s %s"
+  puts format % ["-u", "Use UTC for snapshots."]
+  puts format % ["INTERVAL", "The interval to snapshot."]
+  puts format % ["KEEP", "How many snapshots to keep."]
   exit
 end
 
