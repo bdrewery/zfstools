@@ -37,7 +37,7 @@ end
 ### Get the name of the snapshot to create
 def get_snapshot_name(interval)
   if $use_utc
-    date = Time.now.utc.strftime(get_snapshot_format)
+    date = Time.now.utc.strftime(get_snapshot_format + "U")
   else
     date = Time.now.strftime(get_snapshot_format)
   end
