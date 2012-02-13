@@ -1,7 +1,23 @@
 #! /usr/bin/env ruby
 
+require 'getoptlong'
+
+opts = GetoptLong.new(
+  [ "--utc",   "-u",           GetoptLong::NO_ARGUMENT ]
+)
+
+$use_utc = false
+opts.each do |opt, arg|
+  case opt
+  when '--utc'
+    $use_utc = true
+  end
+end
+
+
 def usage
   puts "Usage: $0 <INTERVAL> <KEEP>"
+  puts "\t-u: Use UTC for snapshots."
   puts "\tINTERVAL: The interval to snapshot."
   puts "\tKEEP: How many snapshots to keep."
   exit
@@ -17,7 +33,11 @@ end
 
 ### Get the name of the snapshot to create
 def get_snapshot_name(interval)
-  date = Time.now.utc.strftime(get_snapshot_format)
+  if $use_utc
+    date = Time.now.utc.strftime(get_snapshot_format)
+  else
+    date = Time.now.strftime(get_snapshot_format)
+  end
   snapshot_prefix(interval) + date
 end
 
