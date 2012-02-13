@@ -159,14 +159,8 @@ def do_new_snapshots(interval)
     create_snapshot dataset, snapshot_name, true
   end
 end
-usage if ARGV.length < 2
 
-interval=ARGV[0]
-keep=ARGV[1].to_i
-
-# Generate new snapshots
-do_new_snapshots(interval) if keep > 0
-
+### Find all snapshots in the given interval
 def find_matching_snapshots(interval)
   dataset_snapshots = {}
   cmd = "zfs list -H -t snapshot -o name -S name"
@@ -185,6 +179,7 @@ def find_matching_snapshots(interval)
   dataset_snapshots
 end
 
+### Find and destroy expired snapshots
 def cleanup_expired_snapshots(interval, keep)
   ### Find all snapshots matching this interval
   dataset_snapshots = find_matching_snapshots(interval)
@@ -198,6 +193,14 @@ def cleanup_expired_snapshots(interval, keep)
     destroy_snapshot snapshot
   end
 end
+
+usage if ARGV.length < 2
+
+interval=ARGV[0]
+keep=ARGV[1].to_i
+
+# Generate new snapshots
+do_new_snapshots(interval) if keep > 0
 
 # Delete expired
 cleanup_expired_snapshots(interval, keep)
