@@ -7,6 +7,10 @@ def usage
   exit
 end
 
+def snapshot_prefix(interval)
+  "zfstools-auto-snap_#{interval}-"
+end
+
 def get_snapshot_format
   '%Y-%m-%dT%H:%M'
 end
@@ -14,7 +18,7 @@ end
 ### Get the name of the snapshot to create
 def get_snapshot_name(interval)
   date = Time.now.utc.strftime(get_snapshot_format)
-  "zfstools-auto-snap_#{interval}-#{date}"
+  snapshot_prefix(interval) + date
 end
 
 ### Find eligible datasets
@@ -91,6 +95,17 @@ def create_snapshot(dataset, snapshot_name, recursive=false)
   flags=[]
   flags << "-r" if recursive
   cmd = "zfs snapshot #{flags.join(" ")} #{dataset}@#{snapshot_name}"
+  puts cmd
+  system(cmd)
+end
+
+### Destroy a snapshot
+def destroy_snapshot(snapshot, recursive=false)
+  # Default to deferred snapshot destroying
+  flags=["-d"]
+  flags << "-r" if recursive
+  cmd = "zfs destroy #{flags.join(" ")} #{snapshot}"
+  puts cmd
   system(cmd)
 end
 
@@ -124,7 +139,42 @@ end
 usage if ARGV.length < 2
 
 interval=ARGV[0]
-keep=ARGV[1]
+keep=ARGV[1].to_i
 
 # Generate new snapshots
 do_new_snapshots(interval)
+
+def find_matching_snapshots(interval)
+  dataset_snapshots = {}
+  cmd = "zfs list -H -t snapshot -o name -S name"
+  IO.popen cmd do |io|
+    io.readlines.each do |line|
+      line.chomp!
+      if line.include?(snapshot_prefix(interval))
+        dataset = line.split('@')[0]
+        unless dataset_snapshots.has_key?(dataset)
+          dataset_snapshots[dataset] = []
+        end
+        dataset_snapshots[dataset] << line
+      end
+    end
+  end
+  dataset_snapshots
+end
+
+def cleanup_expired_snapshots(interval, keep)
+  ### Find all snapshots matching this interval
+  dataset_snapshots = find_matching_snapshots(interval)
+  dataset_snapshots.each do |dataset, snapshots|
+    # Want to keep the first 'keep' entries, so slice them off ...
+    dataset_snapshots[dataset].shift(keep)
+    # ... Now the list only contains snapshots eligible to be destroyed.
+  end
+  snapshots_to_destroy = dataset_snapshots.values.flatten
+  snapshots_to_destroy.each do |snapshot|
+    destroy_snapshot snapshot
+  end
+end
+
+# Delete expired
+cleanup_expired_snapshots(interval, keep)
