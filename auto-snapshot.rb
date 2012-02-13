@@ -9,7 +9,7 @@ end
 
 ### Get the name of the snapshot to create
 def get_snapshot_name(interval)
-  date = Time.now.strftime('%Y-%m-%dT%H:%M')
+  date = Time.now.utc.strftime('%Y-%m-%dT%H:%M')
   "zfstools-auto-snap_#{interval}-#{date}"
 end
 
