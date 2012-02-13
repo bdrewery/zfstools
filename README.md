@@ -1,6 +1,6 @@
 # ZFS Tools
 
-Various scripts for administrating ZFS
+Various scripts for administrating ZFS. Modeled after OpenSolaris time-slider
 
 ## Scripts
 
