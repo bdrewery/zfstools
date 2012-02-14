@@ -3,24 +3,29 @@
 require 'getoptlong'
 
 opts = GetoptLong.new(
-  [ "--utc",   "-u",           GetoptLong::NO_ARGUMENT ]
+  [ "--utc",       "-u",           GetoptLong::NO_ARGUMENT ],
+  [ "--dry-run",   "-n",           GetoptLong::NO_ARGUMENT ]
 )
 
 $use_utc = false
+$dry_run = false
 opts.each do |opt, arg|
   case opt
   when '--utc'
     $use_utc = true
+  when '--dry-run'
+    $dry_run = true
   end
 end
 
 
 def usage
   puts <<-EOF
-Usage: $0 [-u] <INTERVAL> <KEEP>
+Usage: $0 [-un] <INTERVAL> <KEEP>
   EOF
   format = "    %-15s %s"
   puts format % ["-u", "Use UTC for snapshots."]
+  puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
   puts format % ["INTERVAL", "The interval to snapshot."]
   puts format % ["KEEP", "How many snapshots to keep."]
   exit
@@ -119,7 +124,7 @@ def create_snapshot(dataset, snapshot_name, recursive=false)
   flags << "-r" if recursive
   cmd = "zfs snapshot #{flags.join(" ")} #{dataset}@#{snapshot_name}"
   puts cmd
-  system(cmd)
+  system(cmd) unless $dry_run
 end
 
 ### Destroy a snapshot
@@ -129,7 +134,7 @@ def destroy_snapshot(snapshot, recursive=false)
   flags << "-r" if recursive
   cmd = "zfs destroy #{flags.join(" ")} #{snapshot}"
   puts cmd
-  system(cmd)
+  system(cmd) unless $dry_run
 end
 
 ### Generate new snapshots
