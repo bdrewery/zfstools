@@ -30,7 +30,7 @@ end
 
 usage if ARGV.length > 0
 
-snapshots = Zfs::Snapshot.find.select { |snapshot| snapshot.used == 0 }
+snapshots = Zfs::Snapshot.find.select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
 snapshots.each do |snapshot|
   if snapshot.used == 0
     puts "Destroying zero-sized snapshot: #{snapshot.name}"

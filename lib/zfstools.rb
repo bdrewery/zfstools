@@ -2,8 +2,12 @@ $:.unshift File.dirname(__FILE__)
 
 require 'zfs/snapshot'
 
-def snapshot_prefix(interval)
-  "zfstools-auto-snap_#{interval}-"
+def snapshot_prefix(interval=nil)
+  prefix = "zfstools-auto-snap_"
+  if interval
+    prefix += "#{interval}-"
+  end
+  prefix
 end
 
 def snapshot_format
