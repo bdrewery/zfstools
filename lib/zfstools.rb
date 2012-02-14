@@ -121,8 +121,7 @@ def do_new_snapshots(interval)
   end
 end
 
-def find_snapshot_by_dataset(prefix)
-  snapshots = Zfs::Snapshot.find prefix
+def group_snapshots_into_datasets(snapshots)
   dataset_snapshots = Hash.new {|h,k| h[k] = [] }
   ### Sort into datasets
   snapshots.each do |snapshot|
@@ -135,7 +134,8 @@ end
 ### Find and destroy expired snapshots
 def cleanup_expired_snapshots(interval, keep)
   ### Find all snapshots matching this interval
-  dataset_snapshots = find_snapshot_by_dataset snapshot_prefix(interval)
+  snapshots = Zfs::Snapshot.find snapshot_prefix(interval)
+  dataset_snapshots = group_snapshots_into_datasets(snapshots)
   dataset_snapshots.each do |dataset, snapshots|
     # Want to keep the first 'keep' entries, so slice them off ...
     dataset_snapshots[dataset].shift(keep)

@@ -31,9 +31,15 @@ end
 usage if ARGV.length > 0
 
 snapshots = Zfs::Snapshot.find.select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
-snapshots.each do |snapshot|
-  if snapshot.used == 0
-    puts "Destroying zero-sized snapshot: #{snapshot.name}"
-    snapshot.destroy
+dataset_snapshots = group_snapshots_into_datasets(snapshots)
+## Group into datasets
+dataset_snapshots.each do |dataset, snapshots|
+  ### Shift off the last, so it maintains the changes
+  snapshots.pop(1)
+  snapshots.each do |snapshot|
+    if snapshot.used == 0
+      puts "Destroying zero-sized snapshot: #{snapshot.name}"
+      snapshot.destroy
+    end
   end
 end
