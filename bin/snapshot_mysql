@@ -1,0 +1,48 @@
+#! /usr/bin/env ruby
+
+lib_dir = File.join(File.dirname(__FILE__), '..', 'lib')
+$LOAD_PATH.unshift lib_dir if File.directory?(lib_dir)
+
+require 'getoptlong'
+require 'zfstools'
+
+opts = GetoptLong.new(
+  [ "--dry-run",   "-n",           GetoptLong::NO_ARGUMENT ]
+)
+
+$dry_run = false
+opts.each do |opt, arg|
+  case opt
+  when '--dry-run'
+    $dry_run = true
+  end
+end
+
+
+def usage
+  puts <<-EOF
+Usage: $0 [-n] DATASET
+  EOF
+  format = "    %-15s %s"
+  puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
+  exit
+end
+
+usage if ARGV.length < 1
+
+dataset=ARGV[0]
+
+snapshot_format = "%Y-%m-%dT%H:%M:%S"
+snapshot_name = Time.now.strftime(snapshot_format)
+snapshot_name = "#{dataset}@#{snapshot_name}"
+
+sql_query=%Q[
+  FLUSH LOGS;
+  FLUSH TABLES WITH READ LOCK;
+  SYSTEM zfs snapshot -r #{snapshot_name};
+  UNLOCK TABLES;
+]
+
+cmd = %Q!mysql -e "#{sql_query}"!
+puts cmd
+system cmd unless $dry_run

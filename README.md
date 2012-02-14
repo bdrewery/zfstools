@@ -22,7 +22,7 @@ Cleans up zero-sized snapshots.
 
     */20 * * * * /usr/local/bin/cleanup_snapshots
 
-### snapshot_mysql.sh
+### snapshot_mysql
 
 Snapshots a mysql server's databases.
 
@@ -32,7 +32,7 @@ Setup a `/root/.my.cnf` with the relevant information on where to connect to, wi
 
 #### Crontab
 
-    */10 * * * * env - HOME=/root /usr/local/bin/snapshot_mysql.sh DATASET
+    */10 * * * * env - HOME=/root /usr/local/bin/snapshot_mysql DATASET
 
 * DATASET - The dataset (filesystem/volume) that contains your mysql data
 
