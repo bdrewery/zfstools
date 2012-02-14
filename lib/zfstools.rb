@@ -1,5 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 
+require 'zfs/snapshot'
+
 def snapshot_prefix(interval)
   "zfstools-auto-snap_#{interval}-"
 end
@@ -87,25 +89,6 @@ def find_recursive_datasets(datasets)
   { 'single' => single, 'recursive' => cleaned_recursive }
 end
 
-### Create a snapshot
-def create_snapshot(dataset, snapshot_name, recursive=false)
-  flags=[]
-  flags << "-r" if recursive
-  cmd = "zfs snapshot #{flags.join(" ")} #{dataset}@#{snapshot_name}"
-  puts cmd
-  system(cmd) unless $dry_run
-end
-
-### Destroy a snapshot
-def destroy_snapshot(snapshot, recursive=false)
-  # Default to deferred snapshot destroying
-  flags=["-d"]
-  flags << "-r" if recursive
-  cmd = "zfs destroy #{flags.join(" ")} #{snapshot}"
-  puts cmd
-  system(cmd) unless $dry_run
-end
-
 ### Generate new snapshots
 def do_new_snapshots(interval)
   datasets = {
@@ -125,42 +108,25 @@ def do_new_snapshots(interval)
 
   # Snapshot single
   datasets['single'].each do |dataset|
-    create_snapshot dataset, snapshot_name
+    Zfs::Snapshot.create("#{dataset}@#{snapshot_name}")
   end
 
   # Snapshot recursive
   datasets['recursive'].each do |dataset|
-    create_snapshot dataset, snapshot_name, true
+    Zfs::Snapshot.create("#{dataset}@#{snapshot_name}", 'recursive' => true)
   end
-end
-
-### Find all snapshots in the given interval
-def find_matching_snapshots(interval)
-  dataset_snapshots = Hash.new {|h,k| h[k] = [] }
-  cmd = "zfs list -H -t snapshot -o name -S name"
-  IO.popen cmd do |io|
-    io.readlines.each do |line|
-      line.chomp!
-      if line.include?(snapshot_prefix(interval))
-        dataset = line.split('@')[0]
-        dataset_snapshots[dataset] << line
-      end
-    end
-  end
-  dataset_snapshots
 end
 
 ### Find and destroy expired snapshots
 def cleanup_expired_snapshots(interval, keep)
   ### Find all snapshots matching this interval
-  dataset_snapshots = find_matching_snapshots(interval)
+  dataset_snapshots = Zfs::Snapshot.find snapshot_prefix(interval)
   dataset_snapshots.each do |dataset, snapshots|
     # Want to keep the first 'keep' entries, so slice them off ...
     dataset_snapshots[dataset].shift(keep)
     # ... Now the list only contains snapshots eligible to be destroyed.
   end
-  snapshots_to_destroy = dataset_snapshots.values.flatten
-  snapshots_to_destroy.each do |snapshot|
-    destroy_snapshot snapshot
+  dataset_snapshots.values.flatten.each do |snapshot|
+    snapshot.destroy
   end
 end
