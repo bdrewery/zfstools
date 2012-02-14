@@ -2,13 +2,13 @@ module Zfs
   class Snapshot
     @@stale_snapshot_size = false
     attr_reader :name
-    def initialize(name, used)
+    def initialize(name, used=nil)
       @name = name
       @used = used
     end
 
     def used
-      if @@stale_snapshot_size
+      if @used.nil? or @@stale_snapshot_size
         cmd = "zfs get -Hp -o value used #{@name}"
         @used = %x[#{cmd}].to_i
       end
