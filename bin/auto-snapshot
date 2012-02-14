@@ -1,7 +1,10 @@
 #! /usr/bin/env ruby
 
+lib_dir = File.join(File.dirname(__FILE__), '..', 'lib')
+$LOAD_PATH.unshift lib_dir if File.directory?(lib_dir)
+
 require 'getoptlong'
-require './lib/zfstools'
+require 'zfstools'
 
 opts = GetoptLong.new(
   [ "--utc",       "-u",           GetoptLong::NO_ARGUMENT ],

@@ -1,3 +1,5 @@
+$:.unshift File.dirname(__FILE__)
+
 def snapshot_prefix(interval)
   "zfstools-auto-snap_#{interval}-"
 end
