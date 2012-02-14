@@ -2,6 +2,14 @@
 
 Various scripts for administrating ZFS. Modeled after OpenSolaris time-slider
 
+## Setup
+
+Install the gem.
+
+    rake install
+
+Setup crontab entries for scripts wanted. See below.
+
 ## Scripts
 
 ### cleanup_snapshots.sh
@@ -12,7 +20,7 @@ Cleans up zero-sized snapshots.
 
 #### Crontab
 
-    */20 * * * * /usr/local/sbin/zfstools/cleanup_snapshots.sh
+    */20 * * * * /usr/local/bin/cleanup_snapshots.sh
 
 ### snapshot_mysql.sh
 
@@ -24,28 +32,28 @@ Setup a `/root/.my.cnf` with the relevant information on where to connect to, wi
 
 #### Crontab
 
-    */10 * * * * env - HOME=/root /usr/local/sbin/zfstools/snapshot_mysql.sh DATASET
+    */10 * * * * env - HOME=/root /usr/local/bin/snapshot_mysql.sh DATASET
 
 * DATASET - The dataset (filesystem/volume) that contains your mysql data
 
-### auto-snapshot.rb
+### auto-snapshot
 
 This will handle automatically snapshotting datasets similar to timeslider from opensolaris. Setup allows you to define your own intervals, snapshot names, and how many to keep for each interval.
 
 ### Usage
 
-    /usr/local/sbin/zfstools/auto-snapshot.rb SNAPSHOT_NAME KEEP
+    /usr/local/bin/auto-snapshot SNAPSHOT_NAME KEEP
 
 * SNAPSHOT_NAME - what to name the snapshots. This is something such as `frequent`, `hourly`, `daily`, `weekly`, `monthly`, etc.
 * KEEP - How many to keep for this SNAPSHOT_NAME. Older ones will be destroyed.
 
 #### Crontab
 
-    15,30,45 * * * * /usr/local/sbin/zfstools/auto-snapshot.rb frequent    3
-    0 * * * *        /usr/local/sbin/zfstools/auto-snapshot.rb hourly     23
-    7 0 * * *        /usr/local/sbin/zfstools/auto-snapshot.rb daily       6
-    14 0 * * 7       /usr/local/sbin/zfstools/auto-snapshot.rb weekly      4
-    28 0 1 * *       /usr/local/sbin/zfstools/auto-snapshot.rb monthly    12
+    15,30,45 * * * * /usr/local/bin/auto-snapshot frequent    3
+    0 * * * *        /usr/local/bin/auto-snapshot hourly     23
+    7 0 * * *        /usr/local/bin/auto-snapshot daily       6
+    14 0 * * 7       /usr/local/bin/auto-snapshot weekly      4
+    28 0 1 * *       /usr/local/bin/auto-snapshot monthly    12
 
 #### Dataset setup
 
