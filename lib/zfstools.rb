@@ -4,16 +4,16 @@ def snapshot_prefix(interval)
   "zfstools-auto-snap_#{interval}-"
 end
 
-def get_snapshot_format
+def snapshot_format
   '%Y-%m-%dT%H:%M'
 end
 
 ### Get the name of the snapshot to create
-def get_snapshot_name(interval)
+def snapshot_name(interval)
   if $use_utc
-    date = Time.now.utc.strftime(get_snapshot_format + "U")
+    date = Time.now.utc.strftime(snapshot_format + "U")
   else
-    date = Time.now.strftime(get_snapshot_format)
+    date = Time.now.strftime(snapshot_format)
   end
   snapshot_prefix(interval) + date
 end
@@ -113,7 +113,7 @@ def do_new_snapshots(interval)
     'excluded' => [],
   }
 
-  snapshot_name = get_snapshot_name(interval)
+  snapshot_name = snapshot_name(interval)
 
   # Gather the datasets given the override property
   find_datasets datasets, "zfstools:auto-snapshot:#{interval}"
