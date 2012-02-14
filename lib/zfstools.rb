@@ -134,16 +134,13 @@ end
 
 ### Find all snapshots in the given interval
 def find_matching_snapshots(interval)
-  dataset_snapshots = {}
+  dataset_snapshots = Hash.new {|h,k| h[k] = [] }
   cmd = "zfs list -H -t snapshot -o name -S name"
   IO.popen cmd do |io|
     io.readlines.each do |line|
       line.chomp!
       if line.include?(snapshot_prefix(interval))
         dataset = line.split('@')[0]
-        unless dataset_snapshots.has_key?(dataset)
-          dataset_snapshots[dataset] = []
-        end
         dataset_snapshots[dataset] << line
       end
     end
