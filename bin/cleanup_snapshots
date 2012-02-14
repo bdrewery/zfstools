@@ -1,0 +1,39 @@
+#! /usr/bin/env ruby
+#
+lib_dir = File.join(File.dirname(__FILE__), '..', 'lib')
+$LOAD_PATH.unshift lib_dir if File.directory?(lib_dir)
+
+require 'getoptlong'
+require 'zfstools'
+
+opts = GetoptLong.new(
+  [ "--dry-run",   "-n",           GetoptLong::NO_ARGUMENT ]
+)
+
+$dry_run = false
+opts.each do |opt, arg|
+  case opt
+  when '--dry-run'
+    $dry_run = true
+  end
+end
+
+
+def usage
+  puts <<-EOF
+Usage: $0 [-n]
+  EOF
+  format = "    %-15s %s"
+  puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
+  exit
+end
+
+usage if ARGV.length > 0
+
+snapshots = Zfs::Snapshot.find.select { |snapshot| snapshot.used == 0 }
+snapshots.each do |snapshot|
+  if snapshot.used == 0
+    puts "Destroying zero-sized snapshot: #{snapshot.name}"
+    snapshot.destroy
+  end
+end

@@ -1,24 +1,35 @@
 module Zfs
   class Snapshot
-    def initialize(snapshot_name)
-      @snapshot_name = snapshot_name
+    @@stale_snapshot_size = false
+    attr_reader :name
+    def initialize(name, used)
+      @name = name
+      @used = used
+    end
+
+    def used
+      if @@stale_snapshot_size
+        cmd = "zfs get -Hp -o value used #{@name}"
+        @used = %x[#{cmd}].to_i
+      end
+      @used
     end
 
     ### Find all snapshots in the given interval
     ### @param String match_on The string to match on snapshots
-    def self.find(match_on)
-      dataset_snapshots = Hash.new {|h,k| h[k] = [] }
-      cmd = "zfs list -H -t snapshot -o name -S name"
+    def self.find(match_on=nil)
+      snapshots = []
+      cmd = "zfs list -H -t snapshot -o name,used -S name"
       IO.popen cmd do |io|
         io.readlines.each do |line|
           line.chomp!
-          if line.include?(match_on)
-            dataset = line.split('@')[0]
-            dataset_snapshots[dataset] << self.new(line)
+          if match_on.nil? or line.include?(match_on)
+            snapshot_name,used = line.split(' ')
+            snapshots << self.new(snapshot_name, used.to_i)
           end
         end
       end
-      dataset_snapshots
+      snapshots
     end
 
     ### Create a snapshot
@@ -32,10 +43,13 @@ module Zfs
 
     ### Destroy a snapshot
     def destroy(options = {})
+      # If destroying a snapshot, need to flag all other snapshot sizes as stale
+      # so they will be relooked up.
+      @@stale_snapshot_size = true
       # Default to deferred snapshot destroying
       flags=["-d"]
       flags << "-r" if options['recursive']
-      cmd = "zfs destroy #{flags.join(" ")} #{@snapshot_name}"
+      cmd = "zfs destroy #{flags.join(" ")} #{@name}"
       puts cmd
       system(cmd) unless $dry_run
     end

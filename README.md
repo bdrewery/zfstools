@@ -12,7 +12,7 @@ Setup crontab entries for scripts wanted. See below.
 
 ## Scripts
 
-### cleanup_snapshots.sh
+### cleanup_snapshots
 
 Cleans up zero-sized snapshots.
 
@@ -20,7 +20,7 @@ Cleans up zero-sized snapshots.
 
 #### Crontab
 
-    */20 * * * * /usr/local/bin/cleanup_snapshots.sh
+    */20 * * * * /usr/local/bin/cleanup_snapshots
 
 ### snapshot_mysql.sh
 
