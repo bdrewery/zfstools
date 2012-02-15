@@ -133,7 +133,9 @@ end
 
 ### Destroy zero-sized snapshots. Recheck after each as the size may have shifted.
 def destroy_zero_sized_snapshots(snapshots)
-  remaining_snapshots = []
+  ### Shift off the last, so it maintains the changes
+  saved_snapshot = snapshots.shift(1)
+  remaining_snapshots = [saved_snapshot]
   snapshots.each do |snapshot|
     if snapshot.used == 0
       puts "Destroying zero-sized snapshot: #{snapshot.name}"
@@ -154,10 +156,8 @@ def cleanup_expired_snapshots(interval, keep)
   ### Cleanup zero-sized snapshots before purging old snapshots
   ### Keep the most recent one of the zeros and restore it for the later expired purging
   dataset_snapshots.each do |dataset, snapshots|
-    ### Shift off the most recent snapshot (which was just made)
-    saved_snapshot = dataset_snapshots[dataset].shift(1)
     ## Delete all of the remaining zero-sized snapshots
-    dataset_snapshots[dataset] = saved_snapshot + destroy_zero_sized_snapshots(snapshots)
+    dataset_snapshots[dataset] = destroy_zero_sized_snapshots(snapshots)
   end
 
   ### Now that zero-sized are removed, remove expired snapshots
