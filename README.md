@@ -6,6 +6,12 @@ Various scripts for administrating ZFS. Modeled after [time-sliderd](http://mail
 
 Install the gem.
 
+## Production version
+
+    gem install zfstools
+
+### Development version
+
     rake install
 
 Setup crontab entries for scripts wanted. See below.
