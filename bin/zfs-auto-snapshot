@@ -7,16 +7,20 @@ require 'getoptlong'
 require 'zfstools'
 
 opts = GetoptLong.new(
-  [ "--utc",       "-u",           GetoptLong::NO_ARGUMENT ],
-  [ "--dry-run",   "-n",           GetoptLong::NO_ARGUMENT ]
+  [ "--utc",                             "-u",           GetoptLong::NO_ARGUMENT ],
+  [ "--keep-zero-sized-snapshots",       "-k",           GetoptLong::NO_ARGUMENT ],
+  [ "--dry-run",                         "-n",           GetoptLong::NO_ARGUMENT ]
 )
 
 $use_utc = false
 $dry_run = false
+destroy_zero_sized_snapshots = true
 opts.each do |opt, arg|
   case opt
   when '--utc'
     $use_utc = true
+  when '--keep-zero-sized-snapshots'
+    destroy_zero_sized_snapshots = false
   when '--dry-run'
     $dry_run = true
   end
@@ -25,11 +29,12 @@ end
 
 def usage
   puts <<-EOF
-Usage: $0 [-un] <INTERVAL> <KEEP>
+Usage: $0 [-unk] <INTERVAL> <KEEP>
   EOF
   format = "    %-15s %s"
   puts format % ["-u", "Use UTC for snapshots."]
   puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
+  puts format % ["-k", "Keep zero-sized snapshots."]
   puts format % ["INTERVAL", "The interval to snapshot."]
   puts format % ["KEEP", "How many snapshots to keep."]
   exit
@@ -44,4 +49,4 @@ keep=ARGV[1].to_i
 do_new_snapshots(interval) if keep > 0
 
 # Delete expired
-cleanup_expired_snapshots(interval, keep)
+cleanup_expired_snapshots(interval, keep, destroy_zero_sized_snapshots)

@@ -148,16 +148,18 @@ def destroy_zero_sized_snapshots(snapshots)
 end
 
 ### Find and destroy expired snapshots
-def cleanup_expired_snapshots(interval, keep)
+def cleanup_expired_snapshots(interval, keep, destroy_zero_sized_snapshots)
   ### Find all snapshots matching this interval
   snapshots = Zfs::Snapshot.find snapshot_prefix(interval)
   dataset_snapshots = group_snapshots_into_datasets(snapshots)
 
-  ### Cleanup zero-sized snapshots before purging old snapshots
-  ### Keep the most recent one of the zeros and restore it for the later expired purging
-  dataset_snapshots.each do |dataset, snapshots|
-    ## Delete all of the remaining zero-sized snapshots
-    dataset_snapshots[dataset] = destroy_zero_sized_snapshots(snapshots)
+  if destroy_zero_sized_snapshots
+    ### Cleanup zero-sized snapshots before purging old snapshots
+    ### Keep the most recent one of the zeros and restore it for the later expired purging
+    dataset_snapshots.each do |dataset, snapshots|
+      ## Delete all of the remaining zero-sized snapshots
+      dataset_snapshots[dataset] = destroy_zero_sized_snapshots(snapshots)
+    end
   end
 
   ### Now that zero-sized are removed, remove expired snapshots
