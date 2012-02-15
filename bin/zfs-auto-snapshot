@@ -9,6 +9,7 @@ require 'zfstools'
 opts = GetoptLong.new(
   [ "--utc",                             "-u",           GetoptLong::NO_ARGUMENT ],
   [ "--keep-zero-sized-snapshots",       "-k",           GetoptLong::NO_ARGUMENT ],
+  [ "--parallel-snapshots",              "-p",           GetoptLong::NO_ARGUMENT ],
   [ "--dry-run",                         "-n",           GetoptLong::NO_ARGUMENT ]
 )
 
@@ -21,6 +22,8 @@ opts.each do |opt, arg|
     $use_utc = true
   when '--keep-zero-sized-snapshots'
     destroy_zero_sized_snapshots = false
+  when '--parallel-snapshots'
+    $use_threads = true
   when '--dry-run'
     $dry_run = true
   end
@@ -29,12 +32,13 @@ end
 
 def usage
   puts <<-EOF
-Usage: $0 [-unk] <INTERVAL> <KEEP>
+Usage: $0 [-unkp] <INTERVAL> <KEEP>
   EOF
   format = "    %-15s %s"
   puts format % ["-u", "Use UTC for snapshots."]
   puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
   puts format % ["-k", "Keep zero-sized snapshots."]
+  puts format % ["-p", "Create snapshots in parallel."]
   puts format % ["INTERVAL", "The interval to snapshot."]
   puts format % ["KEEP", "How many snapshots to keep."]
   exit
