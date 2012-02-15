@@ -36,10 +36,5 @@ dataset_snapshots = group_snapshots_into_datasets(snapshots)
 dataset_snapshots.each do |dataset, snapshots|
   ### Shift off the last, so it maintains the changes
   snapshots.pop(1)
-  snapshots.each do |snapshot|
-    if snapshot.used == 0
-      puts "Destroying zero-sized snapshot: #{snapshot.name}"
-      snapshot.destroy
-    end
-  end
+  destroy_zero_sized_snapshots(snapshots)
 end
