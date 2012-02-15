@@ -11,7 +11,7 @@ def snapshot_prefix(interval=nil)
 end
 
 def snapshot_format
-  '%Y-%m-%dT%H:%M'
+  '%Y-%m-%d-%Hh%M'
 end
 
 ### Get the name of the snapshot to create
