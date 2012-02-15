@@ -57,12 +57,12 @@ This will handle automatically snapshotting datasets similar to timeslider from 
 
 #### Dataset setup
 
-Only datasets with the `zfstools:auto-snapshot` property set to `true` will be snapshotted.
+Only datasets with the `com.sun:auto-snapshot` property set to `true` will be snapshotted.
 
-    zfs set zfstools:auto-snapshot=true DATASET
+    zfs set com.sun:auto-snapshot=true DATASET
 
 ##### Overrides
 
 You can override a child dataset to use, or not use auto snapshotting by settings its flag with the given interval.
 
-    zfs set zfstools:auto-snapshot:weekly=false DATASET
+    zfs set com.sun:auto-snapshot:weekly=false DATASET

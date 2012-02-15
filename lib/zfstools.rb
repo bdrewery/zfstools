@@ -103,9 +103,9 @@ def do_new_snapshots(interval)
   snapshot_name = snapshot_name(interval)
 
   # Gather the datasets given the override property
-  find_datasets datasets, "zfstools:auto-snapshot:#{interval}"
+  find_datasets datasets, "com.sun:auto-snapshot:#{interval}"
   # Gather all of the datasets without an override
-  find_datasets datasets, "zfstools:auto-snapshot"
+  find_datasets datasets, "com.sun:auto-snapshot"
 
   ### Determine which datasets can be snapshotted recursively and which not
   datasets = find_recursive_datasets datasets
