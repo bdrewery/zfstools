@@ -187,7 +187,12 @@ def cleanup_expired_snapshots(datasets, interval, keep, destroy_zero_sized_snaps
     dataset_snapshots[dataset].shift(keep)
     # ... Now the list only contains snapshots eligible to be destroyed.
   end
+  threads = []
   dataset_snapshots.values.flatten.each do |snapshot|
-    snapshot.destroy
+    threads << Thread.new do
+      snapshot.destroy
+    end
+    threads.last.join unless $use_threads
   end
+  threads.each { |th| th.join }
 end
