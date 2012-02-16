@@ -90,17 +90,20 @@ def find_recursive_datasets(datasets)
   end
 
 
-  { 'single' => single, 'recursive' => cleaned_recursive }
+  {
+    'single' => single,
+    'recursive' => cleaned_recursive,
+    'included' => datasets['included'],
+    'excluded' => datasets['excluded'],
+  }
 end
 
-### Generate new snapshots
-def do_new_snapshots(interval)
+def find_eligible_datasets(interval)
   datasets = {
     'included' => [],
     'excluded' => [],
   }
 
-  snapshot_name = snapshot_name(interval)
 
   # Gather the datasets given the override property
   find_datasets datasets, "com.sun:auto-snapshot:#{interval}"
@@ -109,6 +112,11 @@ def do_new_snapshots(interval)
 
   ### Determine which datasets can be snapshotted recursively and which not
   datasets = find_recursive_datasets datasets
+end
+
+### Generate new snapshots
+def do_new_snapshots(datasets, interval)
+  snapshot_name = snapshot_name(interval)
 
   threads = []
   # Snapshot single
@@ -157,10 +165,12 @@ def destroy_zero_sized_snapshots(snapshots)
 end
 
 ### Find and destroy expired snapshots
-def cleanup_expired_snapshots(interval, keep, destroy_zero_sized_snapshots)
+def cleanup_expired_snapshots(datasets, interval, keep, destroy_zero_sized_snapshots)
   ### Find all snapshots matching this interval
   snapshots = Zfs::Snapshot.list.select { |snapshot| snapshot.name.include?(snapshot_prefix(interval)) }
   dataset_snapshots = group_snapshots_into_datasets(snapshots)
+  ### Filter out datasets not included
+  dataset_snapshots.select! { |dataset, snapshots| datasets['included'].include?(dataset) }
 
   if destroy_zero_sized_snapshots
     ### Cleanup zero-sized snapshots before purging old snapshots

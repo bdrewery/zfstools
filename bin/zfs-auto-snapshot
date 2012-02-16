@@ -49,8 +49,10 @@ usage if ARGV.length < 2
 interval=ARGV[0]
 keep=ARGV[1].to_i
 
+datasets = find_eligible_datasets(interval)
+
 # Generate new snapshots
-do_new_snapshots(interval) if keep > 0
+do_new_snapshots(datasets, interval) if keep > 0
 
 # Delete expired
-cleanup_expired_snapshots(interval, keep, destroy_zero_sized_snapshots)
+cleanup_expired_snapshots(datasets, interval, keep, destroy_zero_sized_snapshots)
