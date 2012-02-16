@@ -29,6 +29,7 @@ def find_datasets(datasets, property)
   cmd="zfs list -H -t filesystem,volume -o name,#{property} -s name"
   all_datasets = datasets['included'] + datasets['excluded']
 
+  puts cmd if $verbose
   IO.popen cmd do |io|
     io.readlines.each do |line|
       dataset,value = line.split(" ")
