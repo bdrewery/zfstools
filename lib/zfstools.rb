@@ -175,10 +175,16 @@ def cleanup_expired_snapshots(datasets, interval, keep, destroy_zero_sized_snaps
   if destroy_zero_sized_snapshots
     ### Cleanup zero-sized snapshots before purging old snapshots
     ### Keep the most recent one of the zeros and restore it for the later expired purging
+    threads = []
     dataset_snapshots.each do |dataset, snapshots|
-      ## Delete all of the remaining zero-sized snapshots
-      dataset_snapshots[dataset] = destroy_zero_sized_snapshots(snapshots)
+      ## Safe to run this in a thread as each dataset's snapshots shift on themselves, but not outside.
+      threads << Thread.new do
+        ## Delete all of the remaining zero-sized snapshots
+        dataset_snapshots[dataset] = destroy_zero_sized_snapshots(snapshots)
+      end
+      threads.last.join unless $use_threads
     end
+    threads.each { |th| th.join }
   end
 
   ### Now that zero-sized are removed, remove expired snapshots
