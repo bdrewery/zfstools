@@ -30,7 +30,7 @@ end
 
 usage if ARGV.length > 0
 
-snapshots = Zfs::Snapshot.find.select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
+snapshots = Zfs::Snapshot.list.select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
 dataset_snapshots = group_snapshots_into_datasets(snapshots)
 ## Group into datasets
 dataset_snapshots.each do |dataset, snapshots|

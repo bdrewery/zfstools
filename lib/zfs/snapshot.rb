@@ -15,18 +15,16 @@ module Zfs
       @used
     end
 
-    ### Find all snapshots in the given interval
-    ### @param String match_on The string to match on snapshots
-    def self.find(match_on=nil)
+    ### List all snapshots
+    def self.list
       snapshots = []
       cmd = "zfs list -H -t snapshot -o name,used -S name"
+      puts cmd
       IO.popen cmd do |io|
         io.readlines.each do |line|
           line.chomp!
-          if match_on.nil? or line.include?(match_on)
-            snapshot_name,used = line.split(' ')
-            snapshots << self.new(snapshot_name, used.to_i)
-          end
+          snapshot_name,used = line.split(' ')
+          snapshots << self.new(snapshot_name, used.to_i)
         end
       end
       snapshots
