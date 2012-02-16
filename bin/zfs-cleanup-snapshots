@@ -7,15 +7,19 @@ require 'getoptlong'
 require 'zfstools'
 
 opts = GetoptLong.new(
-  [ "--dry-run",   "-n",           GetoptLong::NO_ARGUMENT ],
-  [ "--verbose",   "-v",           GetoptLong::NO_ARGUMENT ]
+  [ "--parallel-snapshots",              "-p",           GetoptLong::NO_ARGUMENT ],
+  [ "--dry-run",                         "-n",           GetoptLong::NO_ARGUMENT ],
+  [ "--verbose",                         "-v",           GetoptLong::NO_ARGUMENT ]
 )
 
 $dry_run = false
+$use_threads = false
 opts.each do |opt, arg|
   case opt
   when '--dry-run'
     $dry_run = true
+  when '--parallel-snapshots'
+    $use_threads = true
   when '--verbose'
     $verbose = true
   end
@@ -35,8 +39,6 @@ end
 usage if ARGV.length > 0
 
 snapshots = Zfs::Snapshot.list.select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
-dataset_snapshots = group_snapshots_into_datasets(snapshots)
 ## Group into datasets
-dataset_snapshots.each do |dataset, snapshots|
-  destroy_zero_sized_snapshots(snapshots)
-end
+dataset_snapshots = group_snapshots_into_datasets(snapshots)
+dataset_snapshots = datasets_destroy_zero_sized_snapshots(dataset_snapshots)
