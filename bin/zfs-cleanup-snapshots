@@ -7,7 +7,8 @@ require 'getoptlong'
 require 'zfstools'
 
 opts = GetoptLong.new(
-  [ "--dry-run",   "-n",           GetoptLong::NO_ARGUMENT ]
+  [ "--dry-run",   "-n",           GetoptLong::NO_ARGUMENT ],
+  [ "--verbose",   "-v",           GetoptLong::NO_ARGUMENT ]
 )
 
 $dry_run = false
@@ -15,16 +16,19 @@ opts.each do |opt, arg|
   case opt
   when '--dry-run'
     $dry_run = true
+  when '--verbose'
+    $verbose = true
   end
 end
 
 
 def usage
   puts <<-EOF
-Usage: $0 [-n]
+Usage: $0 [-nv]
   EOF
   format = "    %-15s %s"
   puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
+  puts format % ["-v", "Show what is being done."]
   exit
 end
 

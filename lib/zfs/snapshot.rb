@@ -23,7 +23,7 @@ module Zfs
       flags << "-r" if options['recursive']
       cmd = "zfs list #{flags.join(" ")} -H -t snapshot -o name,used -S name"
       cmd += " #{dataset}" if dataset
-      puts cmd
+      puts cmd if $verbose
       IO.popen cmd do |io|
         io.readlines.each do |line|
           line.chomp!
@@ -39,7 +39,7 @@ module Zfs
       flags=[]
       flags << "-r" if options['recursive']
       cmd = "zfs snapshot #{flags.join(" ")} #{snapshot}"
-      puts cmd
+      puts cmd if $verbose
       system(cmd) unless $dry_run
     end
 
@@ -52,7 +52,7 @@ module Zfs
       flags=["-d"]
       flags << "-r" if options['recursive']
       cmd = "zfs destroy #{flags.join(" ")} #{@name}"
-      puts cmd
+      puts cmd if $verbose
       system(cmd) unless $dry_run
     end
 
