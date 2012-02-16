@@ -16,9 +16,13 @@ module Zfs
     end
 
     ### List all snapshots
-    def self.list
+    def self.list(dataset=nil, options={})
       snapshots = []
-      cmd = "zfs list -H -t snapshot -o name,used -S name"
+      flags=[]
+      flags << "-d 1" if dataset and !options['recursive']
+      flags << "-r" if options['recursive']
+      cmd = "zfs list #{flags.join(" ")} -H -t snapshot -o name,used -S name"
+      cmd += " #{dataset}" if dataset
       puts cmd
       IO.popen cmd do |io|
         io.readlines.each do |line|
