@@ -36,13 +36,7 @@ module Zfs
       flags << "-r" if options['recursive']
       cmd = "zfs snapshot #{flags.join(" ")} #{snapshot}"
       puts cmd
-      unless $dry_run
-        if $use_threads
-          Thread.new { system(cmd) }
-        else
-          system(cmd)
-        end
-      end
+      system(cmd) unless $dry_run
     end
 
     ### Destroy a snapshot

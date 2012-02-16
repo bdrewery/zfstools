@@ -110,15 +110,24 @@ def do_new_snapshots(interval)
   ### Determine which datasets can be snapshotted recursively and which not
   datasets = find_recursive_datasets datasets
 
+  threads = []
   # Snapshot single
   datasets['single'].each do |dataset|
-    Zfs::Snapshot.create("#{dataset}@#{snapshot_name}")
+    threads << Thread.new do
+      Zfs::Snapshot.create("#{dataset}@#{snapshot_name}")
+    end
+    threads.last.join unless $use_threads
   end
 
   # Snapshot recursive
   datasets['recursive'].each do |dataset|
-    Zfs::Snapshot.create("#{dataset}@#{snapshot_name}", 'recursive' => true)
+    threads << Thread.new do
+      Zfs::Snapshot.create("#{dataset}@#{snapshot_name}", 'recursive' => true)
+    end
+    threads.last.join unless $use_threads
   end
+
+  threads.each { |th| th.join }
 end
 
 def group_snapshots_into_datasets(snapshots)
