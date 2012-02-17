@@ -15,7 +15,7 @@ module Zfs
       datasets = []
       cmd_properties = ["name"] + properties
       cmd="zfs list -H -t filesystem,volume -o #{cmd_properties.join(",")} -s name"
-      puts cmd if $verbose
+      puts cmd if $debug
       IO.popen cmd do |io|
         io.readlines.each do |line|
           values = line.split

@@ -10,7 +10,7 @@ module Zfs
     def used
       if @used.nil? or @@stale_snapshot_size
         cmd = "zfs get -Hp -o value used #{@name}"
-        puts cmd if $verbose
+        puts cmd if $debug
         @used = %x[#{cmd}].to_i
       end
       @used
@@ -31,7 +31,7 @@ module Zfs
       flags << "-r" if options['recursive']
       cmd = "zfs list #{flags.join(" ")} -H -t snapshot -o name,used -S name"
       cmd += " #{dataset}" if dataset
-      puts cmd if $verbose
+      puts cmd if $debug
       IO.popen cmd do |io|
         io.readlines.each do |line|
           line.chomp!
@@ -62,7 +62,7 @@ module Zfs
         end
       end
 
-      puts cmd if $verbose
+      puts cmd if $debug || $verbose
       system(cmd) unless $dry_run
     end
 
@@ -75,7 +75,7 @@ module Zfs
       flags=["-d"]
       flags << "-r" if options['recursive']
       cmd = "zfs destroy #{flags.join(" ")} #{@name}"
-      puts cmd if $verbose
+      puts cmd if $debug
       system(cmd) unless $dry_run
     end
 

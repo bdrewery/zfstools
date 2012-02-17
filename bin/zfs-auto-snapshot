@@ -11,7 +11,8 @@ opts = GetoptLong.new(
   [ "--keep-zero-sized-snapshots",       "-k",           GetoptLong::NO_ARGUMENT ],
   [ "--parallel-snapshots",              "-p",           GetoptLong::NO_ARGUMENT ],
   [ "--dry-run",                         "-n",           GetoptLong::NO_ARGUMENT ],
-  [ "--verbose",                         "-v",           GetoptLong::NO_ARGUMENT ]
+  [ "--verbose",                         "-v",           GetoptLong::NO_ARGUMENT ],
+  [ "--debug",                           "-d",           GetoptLong::NO_ARGUMENT ]
 )
 
 $use_utc = false
@@ -29,19 +30,22 @@ opts.each do |opt, arg|
     $dry_run = true
   when '--verbose'
     $verbose = true
+  when '--debug'
+    $debug = true
   end
 end
 
 
 def usage
   puts <<-EOF
-Usage: $0 [-unkpv] <INTERVAL> <KEEP>
+Usage: $0 [-dknpuv] <INTERVAL> <KEEP>
   EOF
   format = "    %-15s %s"
-  puts format % ["-u", "Use UTC for snapshots."]
-  puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
+  puts format % ["-d", "Show debug output."]
   puts format % ["-k", "Keep zero-sized snapshots."]
+  puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
   puts format % ["-p", "Create snapshots in parallel."]
+  puts format % ["-u", "Use UTC for snapshots."]
   puts format % ["-v", "Show what is being done."]
   puts format % ["INTERVAL", "The interval to snapshot."]
   puts format % ["KEEP", "How many snapshots to keep."]
