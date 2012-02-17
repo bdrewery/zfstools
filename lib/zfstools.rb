@@ -141,7 +141,7 @@ def do_new_snapshots(datasets, interval)
   # Snapshot single
   datasets['single'].each do |dataset|
     threads << Thread.new do
-      Zfs::Snapshot.create("#{dataset.name}@#{snapshot_name}")
+      Zfs::Snapshot.create("#{dataset.name}@#{snapshot_name}", 'db' => dataset.db)
     end
     threads.last.join unless $use_threads
   end
@@ -149,7 +149,7 @@ def do_new_snapshots(datasets, interval)
   # Snapshot recursive
   datasets['recursive'].each do |dataset|
     threads << Thread.new do
-      Zfs::Snapshot.create("#{dataset.name}@#{snapshot_name}", 'recursive' => true)
+      Zfs::Snapshot.create("#{dataset.name}@#{snapshot_name}", 'recursive' => true, 'db' => dataset.db)
     end
     threads.last.join unless $use_threads
   end
