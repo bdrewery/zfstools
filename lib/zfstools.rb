@@ -3,6 +3,10 @@ $:.unshift File.dirname(__FILE__)
 require 'zfs/snapshot'
 require 'zfs/dataset'
 
+def snapshot_property
+  "com.sun:auto-snapshot"
+end
+
 def snapshot_prefix(interval=nil)
   prefix = "zfs-auto-snap"
   if interval
@@ -97,8 +101,8 @@ end
 
 def find_eligible_datasets(interval)
   properties = [
-    "com.sun:auto-snapshot:#{interval}",
-    "com.sun:auto-snapshot",
+    "#{snapshot_property}:#{interval}",
+    snapshot_property,
   ]
   datasets = Zfs::Dataset.list(properties)
 
@@ -109,9 +113,9 @@ def find_eligible_datasets(interval)
   }
 
   # Gather the datasets given the override property
-  filter_datasets datasets, included_excluded_datasets, "com.sun:auto-snapshot:#{interval}"
+  filter_datasets datasets, included_excluded_datasets, "#{snapshot_property}:#{interval}"
   # Gather all of the datasets without an override
-  filter_datasets datasets, included_excluded_datasets, "com.sun:auto-snapshot"
+  filter_datasets datasets, included_excluded_datasets, snapshot_property
 
   ### Determine which datasets can be snapshotted recursively and which not
   datasets = find_recursive_datasets included_excluded_datasets
