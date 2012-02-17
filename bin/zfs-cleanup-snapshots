@@ -40,5 +40,6 @@ usage if ARGV.length > 0
 
 snapshots = Zfs::Snapshot.list.select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
 ## Group into datasets
-dataset_snapshots = group_snapshots_into_datasets(snapshots)
+datasets = Zfs::Dataset.list
+dataset_snapshots = group_snapshots_into_datasets(snapshots, datasets)
 dataset_snapshots = datasets_destroy_zero_sized_snapshots(dataset_snapshots)

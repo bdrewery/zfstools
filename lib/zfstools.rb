@@ -1,6 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 
 require 'zfs/snapshot'
+require 'zfs/dataset'
 
 def snapshot_prefix(interval=nil)
   prefix = "zfs-auto-snap"
@@ -24,28 +25,6 @@ def snapshot_name(interval)
   snapshot_prefix(interval) + date
 end
 
-### Find eligible datasets
-def find_datasets(datasets, property)
-  cmd="zfs list -H -t filesystem,volume -o name,#{property} -s name"
-  all_datasets = datasets['included'] + datasets['excluded']
-
-  puts cmd if $verbose
-  IO.popen cmd do |io|
-    io.readlines.each do |line|
-      dataset,value = line.split(" ")
-      # Skip datasets with no value set
-      next if value == "-"
-      # If the dataset is already included/excluded, skip it (for override checking)
-      next if all_datasets.include? dataset
-      if value == "true"
-        datasets['included'] << dataset
-      elsif value == "false"
-        datasets['excluded'] << dataset
-      end
-    end
-  end
-end
-
 ### Find which datasets can be recursively snapshotted
 ### single snapshot restrictions apply to datasets that have a child in the excluded list
 def find_recursive_datasets(datasets)
@@ -58,7 +37,7 @@ def find_recursive_datasets(datasets)
   datasets['included'].each do |dataset|
     excluded_child = false
     # Find all children_datasets
-    children_datasets = all_datasets.select { |child_dataset| child_dataset.start_with? dataset }
+    children_datasets = all_datasets.select { |child_dataset| child_dataset.name.start_with? dataset.name }
     children_datasets.each do |child_dataset|
       if datasets['excluded'].include?(child_dataset)
         excluded_child = true
@@ -73,9 +52,9 @@ def find_recursive_datasets(datasets)
 
   ## Cleanup recursive
   recursive.each do |dataset|
-    if dataset.include?('/')
-      parts = dataset.rpartition('/')
-      parent = parts[0]
+    if dataset.name.include?('/')
+      parts = dataset.name.rpartition('/')
+      parent = all_datasets.find { |dataset| dataset.name == parts[0] }
     else
       parent = dataset
     end
@@ -99,20 +78,43 @@ def find_recursive_datasets(datasets)
   }
 end
 
+
+### Find eligible datasets
+def filter_datasets(datasets, included_excluded_datasets, property)
+  all_datasets = included_excluded_datasets['included'] + included_excluded_datasets['excluded']
+
+  datasets.each do |dataset|
+    # If the dataset is already included/excluded, skip it (for override checking)
+    next if all_datasets.include? dataset
+    value = dataset.properties[property]
+    if value == "true"
+      included_excluded_datasets['included'] << dataset
+    elsif value == "false"
+      included_excluded_datasets['excluded'] << dataset
+    end
+  end
+end
+
 def find_eligible_datasets(interval)
-  datasets = {
+  properties = [
+    "com.sun:auto-snapshot:#{interval}",
+    "com.sun:auto-snapshot",
+  ]
+  datasets = Zfs::Dataset.list(properties)
+
+  ### Group datasets into included/excluded for snapshotting
+  included_excluded_datasets = {
     'included' => [],
     'excluded' => [],
   }
 
-
   # Gather the datasets given the override property
-  find_datasets datasets, "com.sun:auto-snapshot:#{interval}"
+  filter_datasets datasets, included_excluded_datasets, "com.sun:auto-snapshot:#{interval}"
   # Gather all of the datasets without an override
-  find_datasets datasets, "com.sun:auto-snapshot"
+  filter_datasets datasets, included_excluded_datasets, "com.sun:auto-snapshot"
 
   ### Determine which datasets can be snapshotted recursively and which not
-  datasets = find_recursive_datasets datasets
+  datasets = find_recursive_datasets included_excluded_datasets
 end
 
 ### Generate new snapshots
@@ -123,7 +125,7 @@ def do_new_snapshots(datasets, interval)
   # Snapshot single
   datasets['single'].each do |dataset|
     threads << Thread.new do
-      Zfs::Snapshot.create("#{dataset}@#{snapshot_name}")
+      Zfs::Snapshot.create("#{dataset.name}@#{snapshot_name}")
     end
     threads.last.join unless $use_threads
   end
@@ -131,7 +133,7 @@ def do_new_snapshots(datasets, interval)
   # Snapshot recursive
   datasets['recursive'].each do |dataset|
     threads << Thread.new do
-      Zfs::Snapshot.create("#{dataset}@#{snapshot_name}", 'recursive' => true)
+      Zfs::Snapshot.create("#{dataset.name}@#{snapshot_name}", 'recursive' => true)
     end
     threads.last.join unless $use_threads
   end
@@ -139,11 +141,12 @@ def do_new_snapshots(datasets, interval)
   threads.each { |th| th.join }
 end
 
-def group_snapshots_into_datasets(snapshots)
+def group_snapshots_into_datasets(snapshots, datasets)
   dataset_snapshots = Hash.new {|h,k| h[k] = [] }
   ### Sort into datasets
   snapshots.each do |snapshot|
-    dataset = snapshot.name.split('@')[0]
+    snapshot_name = snapshot.name.split('@')[0]
+    dataset = datasets.find { |dataset| dataset.name == snapshot_name }
     dataset_snapshots[dataset] << snapshot
   end
   dataset_snapshots
@@ -185,7 +188,7 @@ end
 def cleanup_expired_snapshots(datasets, interval, keep, should_destroy_zero_sized_snapshots)
   ### Find all snapshots matching this interval
   snapshots = Zfs::Snapshot.list.select { |snapshot| snapshot.name.include?(snapshot_prefix(interval)) }
-  dataset_snapshots = group_snapshots_into_datasets(snapshots)
+  dataset_snapshots = group_snapshots_into_datasets(snapshots, datasets['included'] + datasets['excluded'])
   ### Filter out datasets not included
   dataset_snapshots.select! { |dataset, snapshots| datasets['included'].include?(dataset) }
 
