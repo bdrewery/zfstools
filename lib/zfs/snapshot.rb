@@ -16,6 +16,13 @@ module Zfs
       @used
     end
 
+    def is_zero?
+      if @used != 0
+        return false
+      end
+      used
+    end
+
     ### List all snapshots
     def self.list(dataset=nil, options={})
       snapshots = []

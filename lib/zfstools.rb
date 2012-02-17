@@ -155,7 +155,7 @@ def destroy_zero_sized_snapshots(snapshots)
   saved_snapshot = snapshots.shift(1)
   remaining_snapshots = [saved_snapshot]
   snapshots.each do |snapshot|
-    if snapshot.used == 0
+    if snapshot.is_zero?
       puts "Destroying zero-sized snapshot: #{snapshot.name}" if $verbose
       snapshot.destroy
     else
