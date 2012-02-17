@@ -8,7 +8,7 @@ module Zfs
     end
 
     def ==(dataset)
-      @name == dataset.name
+      dataset.equal?(self) || (dataset && dataset.name == @name)
     end
 
     def self.list(properties=[])
