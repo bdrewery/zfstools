@@ -2,13 +2,21 @@ module Zfs
   class Dataset
     attr_reader :name
     attr_reader :properties
+    attr_reader :db
     def initialize(name, properties={}, options={})
       @name = name
       @properties = properties
+      if properties[snapshot_property] == "mysql"
+        self.contains_db!(properties[snapshot_property])
+      end
     end
 
     def ==(dataset)
       dataset.equal?(self) || (dataset && dataset.name == @name)
+    end
+
+    def contains_db!(kind)
+      @db = kind
     end
 
     def self.list(properties=[])

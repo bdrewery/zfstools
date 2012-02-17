@@ -73,6 +73,18 @@ def find_recursive_datasets(datasets)
     cleaned_recursive << dataset unless recursive.include?(parent)
   end
 
+  # If any children have a DB, need to set it in the recursive parent
+  cleaned_recursive.each do |parent|
+    all_datasets.each do |dataset|
+      # Is this dataset a child of the parent?
+      next if !dataset.name.include?(parent.name)
+      # If this dataset has a DB, set the parent to contain it as well.
+      if dataset.db
+        parent.contains_db!(dataset.db)
+      end
+    end
+  end
+
 
   {
     'single' => single,
@@ -91,7 +103,7 @@ def filter_datasets(datasets, included_excluded_datasets, property)
     # If the dataset is already included/excluded, skip it (for override checking)
     next if all_datasets.include? dataset
     value = dataset.properties[property]
-    if value == "true"
+    if value == "true" || value == "mysql"
       included_excluded_datasets['included'] << dataset
     elsif value
       included_excluded_datasets['excluded'] << dataset
