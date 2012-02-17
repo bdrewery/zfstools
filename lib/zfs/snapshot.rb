@@ -47,6 +47,21 @@ module Zfs
       flags=[]
       flags << "-r" if options['recursive']
       cmd = "zfs snapshot #{flags.join(" ")} #{snapshot}"
+
+      if options['db']
+        case options['db']
+        when 'mysql'
+          sql_query=<<-EOF.gsub(/^ {10}/, '')
+
+            FLUSH LOGS;
+            FLUSH TABLES WITH READ LOCK;
+            SYSTEM #{cmd};
+            UNLOCK TABLES;
+          EOF
+          cmd = %Q[mysql -e "#{sql_query}"]
+        end
+      end
+
       puts cmd if $verbose
       system(cmd) unless $dry_run
     end

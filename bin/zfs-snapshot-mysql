@@ -38,15 +38,5 @@ dataset=ARGV[0]
 
 snapshot_format = "%Y-%m-%dT%H:%M:%S"
 snapshot_name = Time.now.strftime(snapshot_format)
-snapshot_name = "#{dataset}@#{snapshot_name}"
-
-sql_query=%Q[
-  FLUSH LOGS;
-  FLUSH TABLES WITH READ LOCK;
-  SYSTEM zfs snapshot -r #{snapshot_name};
-  UNLOCK TABLES;
-]
-
-cmd = %Q!mysql -e "#{sql_query}"!
-puts cmd if $verbose
-system cmd unless $dry_run
+snapshot = "#{dataset}@#{snapshot_name}"
+Zfs::Snapshot.create(snapshot, 'db' => 'mysql', 'recursive' => true)
