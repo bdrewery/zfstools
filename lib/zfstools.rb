@@ -89,7 +89,7 @@ def filter_datasets(datasets, included_excluded_datasets, property)
     value = dataset.properties[property]
     if value == "true"
       included_excluded_datasets['included'] << dataset
-    elsif value == "false"
+    elsif value
       included_excluded_datasets['excluded'] << dataset
     end
   end
