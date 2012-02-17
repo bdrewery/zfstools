@@ -10,6 +10,7 @@ module Zfs
     def used
       if @used.nil? or @@stale_snapshot_size
         cmd = "zfs get -Hp -o value used #{@name}"
+        puts cmd if $verbose
         @used = %x[#{cmd}].to_i
       end
       @used
