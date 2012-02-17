@@ -43,6 +43,12 @@ Only datasets with the `com.sun:auto-snapshot` property set to `true` will be sn
 
     zfs set com.sun:auto-snapshot=true DATASET
 
+##### MySQL Support
+
+Setting a MySQL dataset's property to `mysql` will hook it into the `zfs-snapshot-mysql` script. See its section for setup instructions.
+
+    zfs set com.sun:auto-snapshot=mysql DATASET
+
 ##### Overrides
 
 You can override a child dataset to use, or not use auto snapshotting by settings its flag with the given interval.
