@@ -16,13 +16,13 @@ opts = GetoptLong.new(
 
 $use_utc = false
 $dry_run = false
-destroy_zero_sized_snapshots = true
+should_destroy_zero_sized_snapshots = true
 opts.each do |opt, arg|
   case opt
   when '--utc'
     $use_utc = true
   when '--keep-zero-sized-snapshots'
-    destroy_zero_sized_snapshots = false
+    should_destroy_zero_sized_snapshots = false
   when '--parallel-snapshots'
     $use_threads = true
   when '--dry-run'
@@ -59,4 +59,4 @@ datasets = find_eligible_datasets(interval)
 do_new_snapshots(datasets, interval) if keep > 0
 
 # Delete expired
-cleanup_expired_snapshots(datasets, interval, keep, destroy_zero_sized_snapshots)
+cleanup_expired_snapshots(datasets, interval, keep, should_destroy_zero_sized_snapshots)
