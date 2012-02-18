@@ -17,6 +17,7 @@ module Zfs
 
     def contains_db!(kind)
       @db = kind
+      self
     end
 
     def self.list(properties=[])
