@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{zfstools}
-  s.version = "0.1.0"
+  s.name = "zfstools"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bryan Drewery"]
-  s.date = %q{2012-02-15}
-  s.description = %q{ZFS admin scripts, such as automatic snapshots, mysql snapshotting, scrubbing, etc.}
-  s.email = %q{bryan@shatow.net}
+  s.date = "2012-04-28"
+  s.description = "ZFS admin scripts, such as automatic snapshots, mysql snapshotting, scrubbing, etc."
+  s.email = "bryan@shatow.net"
   s.executables = ["zfs-auto-snapshot", "zfs-cleanup-snapshots", "zfs-snapshot-mysql"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
@@ -34,19 +34,20 @@ Gem::Specification.new do |s|
     "features/step_definitions/zfstools_steps.rb",
     "features/support/env.rb",
     "features/zfstools.feature",
+    "lib/zfs/dataset.rb",
     "lib/zfs/snapshot.rb",
     "lib/zfstools.rb",
     "spec/spec_helper.rb",
-    "spec/zfstools_spec.rb"
+    "spec/zfstools_spec.rb",
+    "zfstools.gemspec"
   ]
-  s.homepage = %q{http://github.com/bdrewery/zfstools}
+  s.homepage = "http://github.com/bdrewery/zfstools"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
-  s.summary = %q{ZFSTools}
+  s.rubygems_version = "1.8.16"
+  s.summary = "ZFSTools"
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
