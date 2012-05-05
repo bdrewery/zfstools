@@ -3,6 +3,14 @@ $:.unshift File.dirname(__FILE__)
 require 'zfs/snapshot'
 require 'zfs/dataset'
 
+# Ruby 1.8 compat for select!
+class Hash
+  def select!(&block)
+    return to_enum(:select!) unless block_given?
+    reject!{|key, value| ! yield key, value}
+  end unless method_defined? :select!
+end
+
 def snapshot_property
   "com.sun:auto-snapshot"
 end
