@@ -58,7 +58,7 @@ def find_recursive_datasets(datasets)
   recursive.each do |dataset|
     if dataset.name.include?('/')
       parts = dataset.name.rpartition('/')
-      parent = all_datasets.find { |dataset| dataset.name == parts[0] }
+      parent = all_datasets.find { |parent_dataset| parent_dataset.name == parts[0] }
     else
       parent = dataset
     end
