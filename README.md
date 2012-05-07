@@ -89,12 +89,7 @@ These settings should be set before importing any data.
 #### Script Usage
 
 Setup a `/root/.my.cnf` with the relevant information on where to connect to, with the proper username/password that has access to `FLUSH LOGS` and `FLUSH TABLES WITH READ LOCK`.
-
-#### Crontab
-
-    */10 * * * * /usr/local/bin/zfs-snapshot-mysql DATASET
-
-* DATASET - The dataset that contains your mysql data
+The `zfs-auto-snapshot` script will automatically flush the tables before saving the snapshots.
 
 ### zfs-cleanup-snapshots
 
