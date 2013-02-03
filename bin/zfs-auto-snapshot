@@ -38,7 +38,7 @@ end
 
 def usage
   puts <<-EOF
-Usage: $0 [-dknpuv] <INTERVAL> <KEEP>
+Usage: #{$0} [-dknpuv] <INTERVAL> <KEEP>
   EOF
   format = "    %-15s %s"
   puts format % ["-d", "Show debug output."]

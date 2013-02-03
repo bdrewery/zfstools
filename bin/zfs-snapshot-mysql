@@ -27,7 +27,7 @@ end
 
 def usage
   puts <<-EOF
-Usage: $0 [-dnv] DATASET
+Usage: #{$0} [-dnv] DATASET
   EOF
   format = "    %-15s %s"
   puts format % ["-d", "Show debug output."]
