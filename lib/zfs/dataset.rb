@@ -20,10 +20,11 @@ module Zfs
       self
     end
 
-    def self.list(properties=[])
+    def self.list(pool=nil, properties=[])
       datasets = []
       cmd_properties = ["name"] + properties
       cmd="zfs list -H -t filesystem,volume -o #{cmd_properties.join(",")} -s name"
+      cmd += " -r #{pool}" if pool
       puts cmd if $debug
       IO.popen cmd do |io|
         io.readlines.each do |line|

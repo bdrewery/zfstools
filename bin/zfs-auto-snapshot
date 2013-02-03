@@ -10,6 +10,7 @@ opts = GetoptLong.new(
   [ "--utc",                             "-u",           GetoptLong::NO_ARGUMENT ],
   [ "--keep-zero-sized-snapshots",       "-k",           GetoptLong::NO_ARGUMENT ],
   [ "--parallel-snapshots",              "-p",           GetoptLong::NO_ARGUMENT ],
+  [ "--pool",                            "-P",           GetoptLong::REQUIRED_ARGUMENT ],
   [ "--dry-run",                         "-n",           GetoptLong::NO_ARGUMENT ],
   [ "--verbose",                         "-v",           GetoptLong::NO_ARGUMENT ],
   [ "--debug",                           "-d",           GetoptLong::NO_ARGUMENT ]
@@ -18,6 +19,7 @@ opts = GetoptLong.new(
 $use_utc = false
 $dry_run = false
 should_destroy_zero_sized_snapshots = true
+pool = nil
 opts.each do |opt, arg|
   case opt
   when '--utc'
@@ -26,6 +28,8 @@ opts.each do |opt, arg|
     should_destroy_zero_sized_snapshots = false
   when '--parallel-snapshots'
     $use_threads = true
+  when '--pool'
+    pool = arg
   when '--dry-run'
     $dry_run = true
   when '--verbose'
@@ -45,6 +49,7 @@ Usage: #{$0} [-dknpuv] <INTERVAL> <KEEP>
   puts format % ["-k", "Keep zero-sized snapshots."]
   puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
   puts format % ["-p", "Create snapshots in parallel."]
+  puts format % ["-P pool", "Act only on the specified pool."]
   puts format % ["-u", "Use UTC for snapshots."]
   puts format % ["-v", "Show what is being done."]
   puts format % ["INTERVAL", "The interval to snapshot."]
@@ -57,10 +62,10 @@ usage if ARGV.length < 2
 interval=ARGV[0]
 keep=ARGV[1].to_i
 
-datasets = find_eligible_datasets(interval)
+datasets = find_eligible_datasets(interval, pool)
 
 # Generate new snapshots
 do_new_snapshots(datasets, interval) if keep > 0
 
 # Delete expired
-cleanup_expired_snapshots(datasets, interval, keep, should_destroy_zero_sized_snapshots)
+cleanup_expired_snapshots(pool, datasets, interval, keep, should_destroy_zero_sized_snapshots)

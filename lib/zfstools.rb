@@ -119,12 +119,12 @@ def filter_datasets(datasets, included_excluded_datasets, property)
   end
 end
 
-def find_eligible_datasets(interval)
+def find_eligible_datasets(interval, pool)
   properties = [
     "#{snapshot_property}:#{interval}",
     snapshot_property,
   ]
-  datasets = Zfs::Dataset.list(properties)
+  datasets = Zfs::Dataset.list(pool, properties)
 
   ### Group datasets into included/excluded for snapshotting
   included_excluded_datasets = {
@@ -209,9 +209,9 @@ def datasets_destroy_zero_sized_snapshots(dataset_snapshots)
 end
 
 ### Find and destroy expired snapshots
-def cleanup_expired_snapshots(datasets, interval, keep, should_destroy_zero_sized_snapshots)
+def cleanup_expired_snapshots(pool, datasets, interval, keep, should_destroy_zero_sized_snapshots)
   ### Find all snapshots matching this interval
-  snapshots = Zfs::Snapshot.list.select { |snapshot| snapshot.name.include?(snapshot_prefix(interval)) }
+  snapshots = Zfs::Snapshot.list(pool).select { |snapshot| snapshot.name.include?(snapshot_prefix(interval)) }
   dataset_snapshots = group_snapshots_into_datasets(snapshots, datasets['included'] + datasets['excluded'])
   ### Filter out datasets not included
   dataset_snapshots.select! { |dataset, snapshots| datasets['included'].include?(dataset) }

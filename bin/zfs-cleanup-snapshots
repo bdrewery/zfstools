@@ -9,18 +9,22 @@ require 'zfstools'
 opts = GetoptLong.new(
   [ "--dry-run",                         "-n",           GetoptLong::NO_ARGUMENT ],
   [ "--parallel-snapshots",              "-p",           GetoptLong::NO_ARGUMENT ],
+  [ "--pool",                            "-P",           GetoptLong::REQUIRED_ARGUMENT ],
   [ "--verbose",                         "-v",           GetoptLong::NO_ARGUMENT ],
   [ "--debug",                           "-d",           GetoptLong::NO_ARGUMENT ]
 )
 
 $dry_run = false
 $use_threads = false
+pool = nil
 opts.each do |opt, arg|
   case opt
   when '--dry-run'
     $dry_run = true
   when '--parallel-snapshots'
     $use_threads = true
+  when '--pool'
+    pool = arg
   when '--verbose'
     $verbose = true
   when '--debug'
@@ -37,14 +41,15 @@ Usage: #{$0} [-dnv]
   puts format % ["-d", "Show debug output."]
   puts format % ["-n", "Do a dry-run. Nothing is committed. Only show what would be done."]
   puts format % ["-p", "Create snapshots in parallel."]
+  puts format % ["-P pool", "Act only on the specified pool."]
   puts format % ["-v", "Show what is being done."]
   exit
 end
 
 usage if ARGV.length > 0
 
-snapshots = Zfs::Snapshot.list.select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
+snapshots = Zfs::Snapshot.list(pool).select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
 ## Group into datasets
-datasets = Zfs::Dataset.list
+datasets = Zfs::Dataset.list(pool)
 dataset_snapshots = group_snapshots_into_datasets(snapshots, datasets)
 dataset_snapshots = datasets_destroy_zero_sized_snapshots(dataset_snapshots)
