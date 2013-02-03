@@ -14,5 +14,5 @@ Various scripts for administrating ZFS. Modeled after OpenSolaris time-slider
 
 == Copyright
 
-Copyright (c) 2012 Bryan Drewery. See LICENSE.txt for
+Copyright (c) 2012-2013 Bryan Drewery. See LICENSE.txt for
 further details.

@@ -16,7 +16,7 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "zfstools"
   gem.homepage = "http://github.com/bdrewery/zfstools"
-  gem.license = "MIT"
+  gem.license = "BSD"
   gem.summary = %Q{ZFSTools}
   gem.description = %Q{ZFS admin scripts, such as automatic snapshots, mysql snapshotting, scrubbing, etc.}
   gem.email = "bryan@shatow.net"

@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bryan Drewery"]
-  s.date = "2012-05-05"
+  s.date = "2013-02-03"
   s.description = "ZFS admin scripts, such as automatic snapshots, mysql snapshotting, scrubbing, etc."
   s.email = "bryan@shatow.net"
   s.executables = ["zfs-auto-snapshot", "zfs-cleanup-snapshots", "zfs-snapshot-mysql"]
@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
     "zfstools.gemspec"
   ]
   s.homepage = "http://github.com/bdrewery/zfstools"
-  s.licenses = ["MIT"]
+  s.licenses = ["BSD"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.16"
   s.summary = "ZFSTools"
