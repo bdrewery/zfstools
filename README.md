@@ -31,11 +31,11 @@ This will handle automatically snapshotting datasets similar to time-sliderd fro
 
 #### Crontab
 
-    15,30,45 * * * * /usr/local/bin/zfs-auto-snapshot frequent    4
-    0 * * * *        /usr/local/bin/zfs-auto-snapshot hourly     24
-    7 0 * * *        /usr/local/bin/zfs-auto-snapshot daily       7
-    14 0 * * 7       /usr/local/bin/zfs-auto-snapshot weekly      4
-    28 0 1 * *       /usr/local/bin/zfs-auto-snapshot monthly    12
+    15,30,45 * * * * root /usr/local/bin/zfs-auto-snapshot frequent  4
+    0        * * * * root /usr/local/bin/zfs-auto-snapshot hourly   24
+    7        0 * * * root /usr/local/bin/zfs-auto-snapshot daily     7
+    14       0 * * 7 root /usr/local/bin/zfs-auto-snapshot weekly    4
+    28       0 1 * * root /usr/local/bin/zfs-auto-snapshot monthly  12
 
 #### Dataset setup
 
