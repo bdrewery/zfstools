@@ -1,7 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 
-require 'zfs/snapshot'
-require 'zfs/dataset'
+require 'zfstools/snapshot'
+require 'zfstools/dataset'
 
 # Ruby 1.8 compat for select!
 class Hash

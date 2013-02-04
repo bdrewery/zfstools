@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bryan Drewery"]
-  s.date = "2013-02-03"
+  s.date = "2013-02-04"
   s.description = "ZFS admin scripts, such as automatic snapshots, mysql snapshotting, scrubbing, etc."
   s.email = "bryan@shatow.net"
   s.executables = ["zfs-auto-snapshot", "zfs-cleanup-snapshots", "zfs-snapshot-mysql"]
@@ -34,9 +34,9 @@ Gem::Specification.new do |s|
     "features/step_definitions/zfstools_steps.rb",
     "features/support/env.rb",
     "features/zfstools.feature",
-    "lib/zfs/dataset.rb",
-    "lib/zfs/snapshot.rb",
     "lib/zfstools.rb",
+    "lib/zfstools/dataset.rb",
+    "lib/zfstools/snapshot.rb",
     "spec/spec_helper.rb",
     "spec/zfstools_spec.rb",
     "zfstools.gemspec"
