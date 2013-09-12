@@ -6,7 +6,7 @@ module Zfs
     def initialize(name, properties={}, options={})
       @name = name
       @properties = properties
-      if properties[snapshot_property] == "mysql"
+      if ["mysql","postgresql"].include? properties[snapshot_property]
         self.contains_db!(properties[snapshot_property])
       end
     end

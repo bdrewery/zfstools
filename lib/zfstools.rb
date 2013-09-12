@@ -111,7 +111,7 @@ def filter_datasets(datasets, included_excluded_datasets, property)
     # If the dataset is already included/excluded, skip it (for override checking)
     next if all_datasets.include? dataset
     value = dataset.properties[property]
-    if value == "true" || value == "mysql"
+    if ["true","mysql","postgresql"].include? value
       included_excluded_datasets['included'] << dataset
     elsif value
       included_excluded_datasets['excluded'] << dataset
