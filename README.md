@@ -55,7 +55,7 @@ Setting a PostgreSQL dataset's property to `postgresql` will cause zfs-auto-snap
 
     zfs set com.sun:auto-snapshot=postgresql DATASET
 
-#### Script Usage
+###### Script Usage
 
 The user executing `zfs-auto-snapshot` will require passwordless login to the `postgres` database and will require either REPLICATION or SUPERUSER privileges. The easiest approach is to set up a trust or ident record in your pg_hba.conf. The `zfs-auto-snapshot` script will execute pg_start_backup() prior to saving the snapshot and execute pg_stop_backup() afterwards. 
 
