@@ -59,6 +59,11 @@ module Zfs
             UNLOCK TABLES;
           EOF
           cmd = %Q[mysql -e "#{sql_query}"]
+        when 'postgresql'
+          sql_pre_query = "SELECT PG_START_BACKUP('zfs-auto-snapshot');"
+          sql_post_query = "SLEECT PG_STOP_BACKUP();"
+          zfs_cmd = cmd
+          cmd = %Q[(psql -c "#{sql_pre_query}" postgres && #{zfs_cmd} ) ; psql -c "#{sql_post_query}" postgres]
         end
       end
 
