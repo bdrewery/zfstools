@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "zfstools"
-  s.version = "0.2.2"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Bryan Drewery"]
-  s.date = "2013-02-04"
+  s.date = "2013-09-18"
   s.description = "ZFS admin scripts, such as automatic snapshots, mysql snapshotting, scrubbing, etc."
   s.email = "bryan@shatow.net"
   s.executables = ["zfs-auto-snapshot", "zfs-cleanup-snapshots", "zfs-snapshot-mysql"]
