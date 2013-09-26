@@ -63,7 +63,7 @@ module Zfs
           sql_pre_query = "SELECT PG_START_BACKUP('zfs-auto-snapshot');"
           sql_post_query = "SELECT PG_STOP_BACKUP();"
           zfs_cmd = cmd
-          cmd = %Q[(psql -c "#{sql_pre_query}" postgres && #{zfs_cmd} ) ; psql -c "#{sql_post_query}" postgres]
+          cmd = %Q[(psql -c "#{sql_pre_query}" postgres ; #{zfs_cmd} ) ; psql -c "#{sql_post_query}" postgres]
         end
       end
 
