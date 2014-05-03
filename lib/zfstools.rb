@@ -108,6 +108,8 @@ def filter_datasets(datasets, included_excluded_datasets, property)
   all_datasets = included_excluded_datasets['included'] + included_excluded_datasets['excluded']
 
   datasets.each do |dataset|
+    # Skip unmounted datasets
+    next if dataset.properties['mounted'] == 'no'
     # If the dataset is already included/excluded, skip it (for override checking)
     next if all_datasets.include? dataset
     value = dataset.properties[property]
@@ -123,6 +125,7 @@ def find_eligible_datasets(interval, pool)
   properties = [
     "#{snapshot_property}:#{interval}",
     snapshot_property,
+    'mounted',
   ]
   datasets = Zfs::Dataset.list(pool, properties)
 
