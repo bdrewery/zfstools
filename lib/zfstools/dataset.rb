@@ -28,7 +28,7 @@ module Zfs
       puts cmd if $debug
       IO.popen cmd do |io|
         io.readlines.each do |line|
-          values = line.split
+          values = line.split("\t")
           name = values.shift
           dataset_properties = {}
           properties.each_with_index do |property_name, i|

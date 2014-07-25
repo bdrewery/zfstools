@@ -9,7 +9,7 @@ module Zfs
 
     def used
       if @used.nil? or @@stale_snapshot_size
-        cmd = "zfs get -Hp -o value used #{@name}"
+        cmd = "zfs get -Hp -o value used \"#{@name}\""
         puts cmd if $debug
         @used = %x[#{cmd}].to_i
       end
@@ -30,12 +30,12 @@ module Zfs
       flags << "-d 1" if dataset and !options['recursive']
       flags << "-r" if options['recursive']
       cmd = "zfs list #{flags.join(" ")} -H -t snapshot -o name,used -S name"
-      cmd += " #{dataset}" if dataset
+      cmd += " \"#{dataset}\"" if dataset
       puts cmd if $debug
       IO.popen cmd do |io|
         io.readlines.each do |line|
           line.chomp!
-          snapshot_name,used = line.split(' ')
+          snapshot_name,used = line.split("\t")
           snapshots << self.new(snapshot_name, used.to_i)
         end
       end
@@ -46,7 +46,7 @@ module Zfs
     def self.create(snapshot, options = {})
       flags=[]
       flags << "-r" if options['recursive']
-      cmd = "zfs snapshot #{flags.join(" ")} #{snapshot}"
+      cmd = "zfs snapshot #{flags.join(" ")} \"#{snapshot}\""
 
       if options['db']
         case options['db']
@@ -79,7 +79,7 @@ module Zfs
       # Default to deferred snapshot destroying
       flags=["-d"]
       flags << "-r" if options['recursive']
-      cmd = "zfs destroy #{flags.join(" ")} #{@name}"
+      cmd = "zfs destroy #{flags.join(" ")} \"#{@name}\""
       puts cmd if $debug
       system(cmd) unless $dry_run
     end
