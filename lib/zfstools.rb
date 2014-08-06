@@ -15,12 +15,12 @@ def snapshot_property
   "com.sun:auto-snapshot"
 end
 
-def snapshot_prefix(interval=nil)
-  prefix = "zfs-auto-snap"
-  if interval
-    prefix += "_#{interval}-"
-  end
-  prefix
+def snapshot_prefix()
+  "zfs-auto-snap"
+end
+
+def snapshot_prefix_interval(interval)
+  snapshot_prefix() + "_#{interval}-"
 end
 
 def snapshot_format
@@ -34,7 +34,7 @@ def snapshot_name(interval)
   else
     date = Time.now.strftime(snapshot_format)
   end
-  snapshot_prefix(interval) + date
+  snapshot_prefix_interval(interval) + date
 end
 
 ### Find which datasets can be recursively snapshotted
@@ -214,7 +214,7 @@ end
 ### Find and destroy expired snapshots
 def cleanup_expired_snapshots(pool, datasets, interval, keep, should_destroy_zero_sized_snapshots)
   ### Find all snapshots matching this interval
-  snapshots = Zfs::Snapshot.list(pool).select { |snapshot| snapshot.name.include?(snapshot_prefix(interval)) }
+  snapshots = Zfs::Snapshot.list(pool).select { |snapshot| snapshot.name.include?(snapshot_prefix_interval(interval)) }
   dataset_snapshots = group_snapshots_into_datasets(snapshots, datasets['included'] + datasets['excluded'])
   ### Filter out datasets not included
   dataset_snapshots.select! { |dataset, snapshots| datasets['included'].include?(dataset) }
