@@ -134,11 +134,11 @@ def find_eligible_datasets(interval, pool)
     'included' => [],
     'excluded' => [],
   }
-
-  # Gather the datasets given the override property
-  filter_datasets datasets, included_excluded_datasets, "#{snapshot_property}:#{interval}"
+  
   # Gather all of the datasets without an override
   filter_datasets datasets, included_excluded_datasets, snapshot_property
+  # Gather the datasets given the override property
+  filter_datasets datasets, included_excluded_datasets, "#{snapshot_property}:#{interval}"
 
   ### Determine which datasets can be snapshotted recursively and which not
   datasets = find_recursive_datasets included_excluded_datasets
