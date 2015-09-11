@@ -48,7 +48,7 @@ end
 
 usage if ARGV.length > 0
 
-snapshots = Zfs::Snapshot.list(pool).select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
+snapshots = Zfs::Snapshot.list(pool, {'recursive' => true}).select { |snapshot| snapshot.used == 0 and !snapshot.name.include?(snapshot_prefix) }
 ## Group into datasets
 datasets = Zfs::Dataset.list(pool)
 dataset_snapshots = group_snapshots_into_datasets(snapshots, datasets)

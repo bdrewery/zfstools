@@ -200,7 +200,7 @@ end
 ### Find and destroy expired snapshots
 def cleanup_expired_snapshots(pool, datasets, interval, keep, should_destroy_zero_sized_snapshots)
   ### Find all snapshots matching this interval
-  snapshots = Zfs::Snapshot.list(pool).select { |snapshot| snapshot.name.include?(snapshot_prefix_interval(interval)) }
+  snapshots = Zfs::Snapshot.list(pool, {'recursive' => true}).select { |snapshot| snapshot.name.include?(snapshot_prefix_interval(interval)) }
   dataset_snapshots = group_snapshots_into_datasets(snapshots, datasets['included'] + datasets['excluded'])
   ### Filter out datasets not included
   dataset_snapshots.select! { |dataset, snapshots| datasets['included'].include?(dataset) }
