@@ -108,12 +108,11 @@ def filter_datasets(datasets, included_excluded_datasets, property)
   all_datasets = included_excluded_datasets['included'] + included_excluded_datasets['excluded']
 
   datasets.each do |dataset|
-    # Skip unmounted datasets
-    next if dataset.properties['mounted'] == 'no'
     # If the dataset is already included/excluded, skip it (for override checking)
     next if all_datasets.include? dataset
     value = dataset.properties[property]
-    if ["true","mysql","postgresql"].include? value
+    # Exclude unmounted datasets.
+    if dataset.properties['mounted'] == "yes" and ["true","mysql","postgresql"].include? value
       included_excluded_datasets['included'] << dataset
     elsif value
       included_excluded_datasets['excluded'] << dataset
