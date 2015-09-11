@@ -12,5 +12,5 @@ group :development do
   gem "cucumber", ">= 0"
   gem "bundler", "~> 1.0.0"
   gem "jeweler", "~> 1.8.3"
-  gem (RUBY_VERSION =~ /^1\.9/ ? "simplecov" : "rcov"), ">= 0"
+  gem "simplecov", ">= 0"
 end

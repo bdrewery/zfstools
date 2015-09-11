@@ -1,23 +1,21 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
-if RUBY_VERSION =~ /^1\.9/
-  require 'simplecov'
+require 'simplecov'
 
-  module SimpleCov::Configuration
-    def clean_filters
-      @filters = []
-    end
+module SimpleCov::Configuration
+  def clean_filters
+    @filters = []
   end
+end
 
-  SimpleCov.configure do
-    clean_filters
-    load_adapter 'test_frameworks'
-  end
+SimpleCov.configure do
+  clean_filters
+  load_adapter 'test_frameworks'
+end
 
-  ENV["COVERAGE"] && SimpleCov.start do
-    add_filter "/.rvm/"
-  end
+ENV["COVERAGE"] && SimpleCov.start do
+  add_filter "/.rvm/"
 end
 
 require 'rspec'
