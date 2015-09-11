@@ -34,8 +34,7 @@ module Zfs
       puts cmd if $debug
       IO.popen cmd do |io|
         io.readlines.each do |line|
-          line.chomp!
-          snapshot_name,used = line.split("\t")
+          snapshot_name,used = line.chomp.split("\t")
           snapshots << self.new(snapshot_name, used.to_i)
         end
       end
