@@ -1,6 +1,6 @@
 # ZFS Tools
 
-Various scripts for administrating ZFS. Modeled after [time-sliderd](http://mail.opensolaris.org/pipermail/zfs-discuss/2009-November/033882.html) and [ZFS Automatic Snapshots](https://blogs.oracle.com/timf/entry/zfs_automatic_snapshots_0_12) from OpenSolaris
+Various scripts for administrating ZFS. Modeled after [time-sliderd](https://web.archive.org/web/20091219060106/http://mail.opensolaris.org/pipermail/zfs-discuss/2009-November/033882.html) and [ZFS Automatic Snapshots](https://web.archive.org/web/20090707205453/http://blogs.sun.com/timf/entry/zfs_automatic_snapshots_0_12) from OpenSolaris
 
 ## Setup
 
