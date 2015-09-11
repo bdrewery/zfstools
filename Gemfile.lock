@@ -41,10 +41,13 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.0.0)
+  bundler (>= 1.0.0)
   cucumber
-  jeweler (~> 1.8.3)
-  rdoc (~> 3.12)
-  rspec (~> 2.8.0)
+  jeweler (>= 1.8.3)
+  rdoc (>= 3.12)
+  rspec (>= 2.8.0)
   simplecov
-  yard (~> 0.7)
+  yard (>= 0.7)
+
+BUNDLED WITH
+   1.10.6
