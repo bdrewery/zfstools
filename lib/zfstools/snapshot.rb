@@ -1,3 +1,6 @@
+require 'enumerator'
+require 'shellwords'
+
 module Zfs
   class Snapshot
     @@stale_snapshot_size = false
@@ -45,7 +48,12 @@ module Zfs
     def self.create(snapshot, options = {})
       flags=[]
       flags << "-r" if options['recursive']
-      cmd = "zfs snapshot #{flags.join(" ")} \"#{snapshot}\""
+      cmd = "zfs snapshot #{flags.join(" ")} "
+      if snapshot.kind_of?(Array)
+        cmd += snapshot.shelljoin
+      else
+        cmd += snapshot.shellescape
+      end
 
       if options['db']
         case options['db']
@@ -68,6 +76,62 @@ module Zfs
 
       puts cmd if $debug || $verbose
       system(cmd) unless $dry_run
+    end
+
+    def self.create_many(snapshot_name, datasets, options={})
+      # If any of the datasets contain a db it needs to be split out
+      need_db_split = false
+      datasets.each do |dataset|
+        if dataset.db
+          need_db_split = true
+          break
+        end
+      end
+
+      # XXX: The feature and ARG_MAX checks are not ideal here but there is
+      # not yet a reason to generalize them to elsewhere.
+      if not need_db_split and not defined?($zfs_feature_multi_snap)
+        # Check for bookmark support, which we'll piggyback on for 'zfs snapshot snap1 snap2 snapN' support.
+        pools = Zfs::Pool.list(nil, ["feature@bookmarks"])
+        has_bookmarks = pools.find { |pool| pool.properties.include?('feature@bookmarks') }
+        $zfs_feature_multi_snap = has_bookmarks
+      end
+      if not need_db_split and $zfs_feature_multi_snap
+        snapshots = []
+        max_length = 0
+        datasets.each do |dataset|
+          snapshot = "#{dataset.name}@#{snapshot_name}"
+          max_length = [snapshot.length, max_length].max
+          snapshots << snapshot
+        end
+        # Etc::sysconf https://bugs.ruby-lang.org/issues/9842 would be nice.
+        if not defined?($arg_max)
+          begin
+            $arg_max = `getconf ARG_MAX`.chomp.to_i
+          rescue Errno::ENOENT
+            $arg_max = 4096
+          end
+          # Env and escaping slack
+          $arg_max = $arg_max - 1024
+        end
+        # Lazy chunking
+        chunks = $arg_max / max_length
+        snapshots.each_slice(chunks) do |snapshots_chunk|
+          self.create(snapshots_chunk, options)
+        end
+      else
+        # Have to brute force.
+        threads = []
+        datasets.each do |dataset|
+          threads << Thread.new do
+            self.create("#{dataset.name}@#{snapshot_name}",
+                        'recursive' => options['recursive'] || false,
+                        'db' => dataset.db)
+          end
+          threads.last.join unless $use_threads
+        end
+        threads.each { |th| th.join }
+      end
     end
 
     ### Destroy a snapshot
