@@ -1,5 +1,6 @@
 require 'enumerator'
 require 'shellwords'
+require 'zfstools/features'
 
 module Zfs
   class Snapshot
@@ -93,15 +94,7 @@ module Zfs
         return if datasets.empty?
       end
 
-      # XXX: The feature and ARG_MAX checks are not ideal here but there is
-      # not yet a reason to generalize them to elsewhere.
-      if not options['single'] and not defined?($zfs_feature_multi_snap)
-        # Check for bookmark support, which we'll piggyback on for 'zfs snapshot snap1 snap2 snapN' support.
-        pools = Zfs::Pool.list(nil, ["feature@bookmarks"])
-        has_bookmarks = pools.find { |pool| pool.properties.include?('feature@bookmarks') }
-        $zfs_feature_multi_snap = has_bookmarks
-      end
-      if not options['single'] and $zfs_feature_multi_snap
+      if not options['single'] and Zfs::Features.has_multi_snap
         snapshots = []
         max_length = 0
         datasets.each do |dataset|
@@ -109,6 +102,8 @@ module Zfs
           max_length = [snapshot.length, max_length].max
           snapshots << snapshot
         end
+        # XXX: The ARG_MAX checks are not ideal here but there is
+        # not yet a reason to generalize it to elsewhere.
         # Etc::sysconf https://bugs.ruby-lang.org/issues/9842 would be nice.
         if not defined?($arg_max)
           begin
