@@ -79,24 +79,29 @@ module Zfs
     end
 
     def self.create_many(snapshot_name, datasets, options={})
-      # If any of the datasets contain a db it needs to be split out
-      need_db_split = false
-      datasets.each do |dataset|
-        if dataset.db
-          need_db_split = true
-          break
+      if not options['single']
+        # If any of the datasets contain a db it needs to be split out
+        db_datasets = []
+        datasets.reject! do |dataset|
+          if dataset.db
+            db_datasets << dataset
+            true
+          end
         end
+        # Create db snapshots individually
+        self.create_many(snapshot_name, db_datasets, options.merge({'single' => true}))
+        return if datasets.empty?
       end
 
       # XXX: The feature and ARG_MAX checks are not ideal here but there is
       # not yet a reason to generalize them to elsewhere.
-      if not need_db_split and not defined?($zfs_feature_multi_snap)
+      if not options['single'] and not defined?($zfs_feature_multi_snap)
         # Check for bookmark support, which we'll piggyback on for 'zfs snapshot snap1 snap2 snapN' support.
         pools = Zfs::Pool.list(nil, ["feature@bookmarks"])
         has_bookmarks = pools.find { |pool| pool.properties.include?('feature@bookmarks') }
         $zfs_feature_multi_snap = has_bookmarks
       end
-      if not need_db_split and $zfs_feature_multi_snap
+      if not options['single'] and $zfs_feature_multi_snap
         snapshots = []
         max_length = 0
         datasets.each do |dataset|
