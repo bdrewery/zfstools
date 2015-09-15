@@ -91,8 +91,9 @@ module Zfs
         end
         # Create db snapshots individually
         self.create_many(snapshot_name, db_datasets, options.merge({'single' => true}))
-        return if datasets.empty?
       end
+
+      return if datasets.empty?
 
       if not options['single'] and Zfs::Features.has_multi_snap
         snapshots = []
