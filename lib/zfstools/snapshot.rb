@@ -116,8 +116,12 @@ module Zfs
         end
         # Lazy chunking
         chunks = $arg_max / max_length
-        snapshots.each_slice(chunks) do |snapshots_chunk|
-          self.create(snapshots_chunk, options)
+        # Group by pool
+        pooled_snapshots = snapshots.group_by { |snapshot| snapshot.split('@')[0].split('/')[0] }
+        pooled_snapshots.each do |pool, snapshots|
+          snapshots.each_slice(chunks) do |snapshots_chunk|
+            self.create(snapshots_chunk, options)
+          end
         end
       else
         # Have to brute force.
