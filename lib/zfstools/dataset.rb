@@ -22,7 +22,7 @@ module Zfs
 
     def self.list(pool=nil, properties=[])
       datasets = []
-      cmd_properties = ["name"] + properties
+      cmd_properties = ["name", "type"] + properties
       cmd="zfs list -H -t filesystem,volume -o #{cmd_properties.join(",")} -s name"
       cmd += " -r #{pool}" if pool
       puts cmd if $debug
@@ -31,6 +31,7 @@ module Zfs
           values = line.chomp.split("\t")
           name = values.shift
           dataset_properties = {}
+          dataset_properties['type'] = values.shift
           properties.each_with_index do |property_name, i|
             value = values[i]
             next if value == '-'
