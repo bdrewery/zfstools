@@ -13,7 +13,8 @@ opts = GetoptLong.new(
   [ "--pool",                            "-P",           GetoptLong::REQUIRED_ARGUMENT ],
   [ "--dry-run",                         "-n",           GetoptLong::NO_ARGUMENT ],
   [ "--verbose",                         "-v",           GetoptLong::NO_ARGUMENT ],
-  [ "--debug",                           "-d",           GetoptLong::NO_ARGUMENT ]
+  [ "--debug",                           "-d",           GetoptLong::NO_ARGUMENT ],
+  [ "--snapshot-prefix",                 "-s",           GetoptLong::REQUIRED_ARGUMENT ]
 )
 
 $use_utc = false
@@ -36,6 +37,8 @@ opts.each do |opt, arg|
     $verbose = true
   when '--debug'
     $debug = true
+  when '--snapshot-prefix'
+    $snapshot_prefix = arg
   end
 end
 
@@ -51,6 +54,7 @@ Usage: #{$0} [-dknpuv] <INTERVAL> <KEEP>
   puts format % ["-p", "Create snapshots in parallel."]
   puts format % ["-P pool", "Act only on the specified pool."]
   puts format % ["-u", "Use UTC for snapshots."]
+  puts format % ["-s", "Specfic snapshot prefix"]
   puts format % ["-v", "Show what is being done."]
   puts format % ["INTERVAL", "The interval to snapshot."]
   puts format % ["KEEP", "How many snapshots to keep."]
