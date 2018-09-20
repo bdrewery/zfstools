@@ -17,7 +17,7 @@ def snapshot_property
 end
 
 def snapshot_prefix()
-  "zfs-auto-snap"
+  $snapshot_prefix ? $snapshot_prefix : "zfs-auto-snap"
 end
 
 def snapshot_prefix_interval(interval)
