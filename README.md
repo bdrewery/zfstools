@@ -24,10 +24,13 @@ This will handle automatically snapshotting datasets similar to time-sliderd fro
 
 ### Usage
 
-    /usr/local/bin/zfs-auto-snapshot INTERVAL KEEP
+    /usr/local/bin/zfs-auto-snapshot INTERVAL KEEP [DESTROY_AFTER]
 
 * INTERVAL - The interval for the snapshot. This is something such as `frequent`, `hourly`, `daily`, `weekly`, `monthly`, etc.
 * KEEP - How many to keep for this INTERVAL. Older ones will be destroyed.
+* DESTROY_AFTER - Create snapshot[s] with maximum lifetime of DESTROY_AFTER days starting from invocation timestamp.
+Snapshot with an expired `zfstools:destroy_after` property will be deleted upon first `zfs-auto-snapshot` invocation with no relation to KEEP argument.
+Userful for snapshots that are created upon non-recurring events (e.g. on boot or manually) so they do not stuck on the pool forever.
 
 #### Crontab
 
@@ -36,6 +39,7 @@ This will handle automatically snapshotting datasets similar to time-sliderd fro
     7        0 * * * root /usr/local/bin/zfs-auto-snapshot daily     7
     14       0 * * 7 root /usr/local/bin/zfs-auto-snapshot weekly    4
     28       0 1 * * root /usr/local/bin/zfs-auto-snapshot monthly  12
+    @reboot          root /usr/local/bin/zfs-auto-snapshot boot      3 30
 
 #### Dataset setup
 
@@ -101,7 +105,9 @@ The `zfs-auto-snapshot` script will automatically flush the tables before saving
 
 ### zfs-cleanup-snapshots
 
-Cleans up zero-sized snapshots. This ignores snapshots created by `zfs-auto-snapshot` as it handles zero-sized in its own special way.
+Cleans up:
+* zero-sized snapshots created not by `zfs-auto-snapshot` as it handles zero-sized in its own special way;
+* snapshots with an expired `zfstools:destroy_after` property.
 
 #### Usage
 
