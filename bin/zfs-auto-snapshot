@@ -45,7 +45,7 @@ end
 
 def usage
   puts <<-EOF
-Usage: #{$0} [-dknpuv] <INTERVAL> <KEEP>
+Usage: #{$0} [-dknpuv] <INTERVAL> <KEEP> [DESTROY_AFTER]
   EOF
   format = "    %-15s %s"
   puts format % ["-d", "Show debug output."]
@@ -58,6 +58,7 @@ Usage: #{$0} [-dknpuv] <INTERVAL> <KEEP>
   puts format % ["-v", "Show what is being done."]
   puts format % ["INTERVAL", "The interval to snapshot."]
   puts format % ["KEEP", "How many snapshots to keep."]
+  puts format % ["DESTROY_AFTER", "Keep created stapshots no more than DESTROY_AFTER days. Snapshots will be deleted upon expiration by this utility."]
   exit
 end
 
@@ -65,11 +66,18 @@ usage if ARGV.length < 2
 
 interval=ARGV[0]
 keep=ARGV[1].to_i
+destroy_after=nil
+if ARGV.length == 3
+  destroy_after = (Time.now.to_i + 24*3600*Integer(ARGV[2])) rescue usage
+end
 
 datasets = find_eligible_datasets(interval, pool)
 
 # Generate new snapshots
-do_new_snapshots(datasets, interval) if keep > 0
+do_new_snapshots(datasets, interval, destroy_after) if keep > 0
+
+# Remove all snapshots with expired destroy_after attribute
+cleanup_attr_expired_snapshots(pool)
 
 # Delete expired
 cleanup_expired_snapshots(pool, datasets, interval, keep, should_destroy_zero_sized_snapshots)

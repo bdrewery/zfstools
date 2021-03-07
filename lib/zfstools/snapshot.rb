@@ -6,9 +6,10 @@ module Zfs
   class Snapshot
     @@stale_snapshot_size = false
     attr_reader :name
-    def initialize(name, used=nil)
+    def initialize(name, used=nil, destroy_after=nil)
       @name = name
       @used = used
+      @destroy_after = destroy_after
     end
 
     def used
@@ -27,19 +28,25 @@ module Zfs
       used
     end
 
+    def destroy_after?(timestamp)
+      return false if @destroy_after.nil? || @destroy_after > timestamp
+      true
+    end
+
     ### List all snapshots
     def self.list(dataset=nil, options={})
       snapshots = []
       flags=[]
       flags << "-d 1" if dataset and !options['recursive']
       flags << "-r" if options['recursive']
-      cmd = "zfs list #{flags.join(" ")} -H -t snapshot -o name,used -S name"
+      cmd = "zfs list #{flags.join(" ")} -H -t snapshot -o name,used,#{destroy_after_property} -S name"
       cmd += " " + dataset.shellescape if dataset
       puts cmd if $debug
       IO.popen cmd do |io|
         io.readlines.each do |line|
-          snapshot_name,used = line.chomp.split("\t")
-          snapshots << self.new(snapshot_name, used.to_i)
+          snapshot_name,used,destroy_after = line.chomp.split("\t")
+          destroy_after = Integer(destroy_after) rescue nil
+          snapshots << self.new(snapshot_name, used.to_i, destroy_after)
         end
       end
       snapshots
@@ -49,6 +56,7 @@ module Zfs
     def self.create(snapshot, options = {})
       flags=[]
       flags << "-r" if options['recursive']
+      flags << "-o #{destroy_after_property}=" + options['destroy_after'].to_s if options['destroy_after']
       cmd = "zfs snapshot #{flags.join(" ")} "
       if snapshot.kind_of?(Array)
         cmd += snapshot.shelljoin
@@ -129,9 +137,11 @@ module Zfs
         threads = []
         datasets.each do |dataset|
           threads << Thread.new do
-            self.create("#{dataset.name}@#{snapshot_name}",
+            self.create("#{dataset.name}@#{snapshot_name}", {
                         'recursive' => options['recursive'] || false,
-                        'db' => dataset.db)
+                        'db' => dataset.db,
+                        'destroy_after' => options['destroy_after'] || false,
+                        })
           end
           threads.last.join unless $use_threads
         end
