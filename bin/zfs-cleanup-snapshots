@@ -53,3 +53,6 @@ snapshots = Zfs::Snapshot.list(pool, {'recursive' => true}).select { |snapshot| 
 datasets = Zfs::Dataset.list(pool)
 dataset_snapshots = group_snapshots_into_datasets(snapshots, datasets)
 dataset_snapshots = datasets_destroy_zero_sized_snapshots(dataset_snapshots)
+
+# Remove all snapshots with expired destroy_after attribute
+cleanup_attr_expired_snapshots(pool)
