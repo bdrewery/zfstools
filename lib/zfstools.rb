@@ -115,7 +115,7 @@ def filter_datasets(datasets, included_excluded_datasets, property)
     # Exclude unmounted datasets.
     if (dataset.properties['mounted'] == "yes" or
         dataset.properties['type'] == "volume") and
-      ["true","mysql","postgresql"].include? value
+      ["true","on","yes","mysql","postgresql"].include? value
       included_excluded_datasets['included'] << dataset
     elsif value
       included_excluded_datasets['excluded'] << dataset
