@@ -5,16 +5,16 @@
 # stub: zfstools 0.3.6 ruby lib
 
 Gem::Specification.new do |s|
-  s.name = "zfstools"
-  s.version = "0.3.6"
+  s.name = "zfstools".freeze
+  s.version = "0.3.6".freeze
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.require_paths = ["lib"]
-  s.authors = ["Bryan Drewery"]
-  s.date = "2015-09-28"
-  s.description = "ZFS admin scripts, such as automatic snapshots, mysql snapshotting, scrubbing, etc."
-  s.email = "bryan@shatow.net"
-  s.executables = ["zfs-auto-snapshot", "zfs-cleanup-snapshots", "zfs-snapshot-mysql"]
+  s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
+  s.require_paths = ["lib".freeze]
+  s.authors = ["Bryan Drewery".freeze]
+  s.date = "1980-01-02"
+  s.description = "ZFS admin scripts, such as automatic snapshots, mysql snapshotting, scrubbing, etc.".freeze
+  s.email = "bryan@shatow.net".freeze
+  s.executables = ["zfs-auto-snapshot".freeze, "zfs-cleanup-snapshots".freeze, "zfs-snapshot-mysql".freeze]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md",
@@ -45,39 +45,20 @@ Gem::Specification.new do |s|
     "spec/zfstools_spec.rb",
     "zfstools.gemspec"
   ]
-  s.homepage = "http://github.com/bdrewery/zfstools"
-  s.licenses = ["BSD"]
-  s.rubygems_version = "2.4.8"
-  s.summary = "ZFSTools"
+  s.homepage = "http://github.com/bdrewery/zfstools".freeze
+  s.licenses = ["BSD".freeze]
+  s.rubygems_version = "3.7.0.dev".freeze
+  s.summary = "ZFSTools".freeze
 
-  if s.respond_to? :specification_version then
-    s.specification_version = 4
+  s.specification_version = 4
 
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>, [">= 2.8.0"])
-      s.add_development_dependency(%q<yard>, [">= 0.7"])
-      s.add_development_dependency(%q<rdoc>, [">= 3.12"])
-      s.add_development_dependency(%q<cucumber>, [">= 0"])
-      s.add_development_dependency(%q<bundler>, [">= 1.0.0"])
-      s.add_development_dependency(%q<jeweler>, [">= 1.8.3"])
-      s.add_development_dependency(%q<simplecov>, [">= 0"])
-    else
-      s.add_dependency(%q<rspec>, [">= 2.8.0"])
-      s.add_dependency(%q<yard>, [">= 0.7"])
-      s.add_dependency(%q<rdoc>, [">= 3.12"])
-      s.add_dependency(%q<cucumber>, [">= 0"])
-      s.add_dependency(%q<bundler>, [">= 1.0.0"])
-      s.add_dependency(%q<jeweler>, [">= 1.8.3"])
-      s.add_dependency(%q<simplecov>, [">= 0"])
-    end
-  else
-    s.add_dependency(%q<rspec>, [">= 2.8.0"])
-    s.add_dependency(%q<yard>, [">= 0.7"])
-    s.add_dependency(%q<rdoc>, [">= 3.12"])
-    s.add_dependency(%q<cucumber>, [">= 0"])
-    s.add_dependency(%q<bundler>, [">= 1.0.0"])
-    s.add_dependency(%q<jeweler>, [">= 1.8.3"])
-    s.add_dependency(%q<simplecov>, [">= 0"])
-  end
+  s.add_runtime_dependency(%q<getoptlong>.freeze, [">= 0".freeze])
+  s.add_development_dependency(%q<rspec>.freeze, [">= 2.8.0".freeze])
+  s.add_development_dependency(%q<yard>.freeze, [">= 0.7".freeze])
+  s.add_development_dependency(%q<rdoc>.freeze, [">= 3.12".freeze])
+  s.add_development_dependency(%q<cucumber>.freeze, [">= 0".freeze])
+  s.add_development_dependency(%q<bundler>.freeze, [">= 1.0.0".freeze])
+  s.add_development_dependency(%q<jeweler>.freeze, [">= 1.8.3".freeze])
+  s.add_development_dependency(%q<simplecov>.freeze, [">= 0".freeze])
 end
 
