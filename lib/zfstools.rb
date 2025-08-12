@@ -105,8 +105,9 @@ end
 
 
 ### Find eligible datasets
-def filter_datasets(datasets, included_excluded_datasets, property)
+def filter_datasets(datasets, included_excluded_datasets, property, extra_eligible)
   all_datasets = included_excluded_datasets['included'] + included_excluded_datasets['excluded']
+  eligible_values = ["true","mysql","postgresql"] + extra_eligible
 
   datasets.each do |dataset|
     # If the dataset is already included/excluded, skip it (for override checking)
@@ -115,7 +116,7 @@ def filter_datasets(datasets, included_excluded_datasets, property)
     # Exclude unmounted datasets.
     if (dataset.properties['mounted'] == "yes" or
         dataset.properties['type'] == "volume") and
-      ["true","mysql","postgresql"].include? value
+        eligible_values.include? value
       included_excluded_datasets['included'] << dataset
     elsif value
       included_excluded_datasets['excluded'] << dataset
@@ -123,7 +124,7 @@ def filter_datasets(datasets, included_excluded_datasets, property)
   end
 end
 
-def find_eligible_datasets(interval, pool)
+def find_eligible_datasets(interval, pool, extra_eligible = [])
   properties = [
     "#{snapshot_property}:#{interval}",
     snapshot_property,
@@ -138,9 +139,9 @@ def find_eligible_datasets(interval, pool)
   }
 
   # Gather the datasets given the override property
-  filter_datasets datasets, included_excluded_datasets, "#{snapshot_property}:#{interval}"
+  filter_datasets datasets, included_excluded_datasets, "#{snapshot_property}:#{interval}", extra_eligible
   # Gather all of the datasets without an override
-  filter_datasets datasets, included_excluded_datasets, snapshot_property
+  filter_datasets datasets, included_excluded_datasets, snapshot_property, extra_eligible
 
   ### Determine which datasets can be snapshotted recursively and which not
   datasets = find_recursive_datasets included_excluded_datasets

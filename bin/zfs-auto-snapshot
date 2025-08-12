@@ -71,5 +71,7 @@ datasets = find_eligible_datasets(interval, pool)
 # Generate new snapshots
 do_new_snapshots(datasets, interval) if keep > 0
 
+datasets = find_eligible_datasets(interval, pool, ['cleanup_only'])
+
 # Delete expired
 cleanup_expired_snapshots(pool, datasets, interval, keep, should_destroy_zero_sized_snapshots)
