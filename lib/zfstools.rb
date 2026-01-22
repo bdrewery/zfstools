@@ -28,6 +28,10 @@ def snapshot_format
   '%Y-%m-%d-%Hh%M'
 end
 
+def destroy_after_property
+  "zfstools:destroy_after"
+end
+
 ### Get the name of the snapshot to create
 def snapshot_name(interval)
   if $use_utc
@@ -147,13 +151,16 @@ def find_eligible_datasets(interval, pool)
 end
 
 ### Generate new snapshots
-def do_new_snapshots(datasets, interval)
+def do_new_snapshots(datasets, interval, destroy_after=nil)
   snapshot_name = snapshot_name(interval)
+  options = {}
+  options['destroy_after'] = destroy_after if destroy_after
 
   # Snapshot single
-  Zfs::Snapshot.create_many(snapshot_name, datasets['single'])
+  Zfs::Snapshot.create_many(snapshot_name, datasets['single'], options)
   # Snapshot recursive
-  Zfs::Snapshot.create_many(snapshot_name, datasets['recursive'], 'recursive'=>true)
+  options['recursive'] = true
+  Zfs::Snapshot.create_many(snapshot_name, datasets['recursive'], options)
 end
 
 def group_snapshots_into_datasets(snapshots, datasets)
@@ -219,6 +226,22 @@ def cleanup_expired_snapshots(pool, datasets, interval, keep, should_destroy_zer
   end
   threads = []
   dataset_snapshots.values.flatten.each do |snapshot|
+    threads << Thread.new do
+      snapshot.destroy
+    end
+    threads.last.join unless $use_threads
+  end
+  threads.each { |th| th.join }
+end
+
+### Find and destroy snapshots with zfstools:destroy_after attribute expired
+### Should be invoked before cleanup_expired_snapshots as we prefer to delete
+### snapshots with zfstools:destroy_after expired rather that by count.
+def cleanup_attr_expired_snapshots(pool)
+  current_timestamp = Time.now.to_i;
+  attr_expired_snapshots = Zfs::Snapshot.list(pool, {'recursive' => true}).select { |snapshot| snapshot.destroy_after?(current_timestamp) }
+  threads = []
+  attr_expired_snapshots.each do |snapshot|
     threads << Thread.new do
       snapshot.destroy
     end
